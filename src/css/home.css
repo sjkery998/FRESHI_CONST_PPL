@@ -1,0 +1,122 @@
+.HomePage{
+    width: 100vw;
+    padding-top: 4.1rem;
+}
+/* Logo Section */
+.logo-case {
+    width: 100%;
+    height: 2rem;
+    padding: 1rem;
+    background-color: white;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: end;
+    position: fixed;
+    z-index: 10;
+}
+
+.logo-case img {
+    height: 60%;
+}
+
+/* Welcome Section */
+.welcome-container {
+    height: 13rem;
+    padding: 0.5rem;
+    background-color: #222B2D;
+    justify-content: space-between;
+    display: flex;
+    flex-direction: column;
+}
+
+.top-case {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 1.5rem;
+}
+
+.top-case .left-side p {
+    display: flex;
+    flex: 1;
+    font-size: 1rem;
+    flex-direction: column;
+    color: white;
+}
+.left-side div{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.left-side p{
+    font-size: 1.1rem;
+}
+.left-side p,
+.left-side h1 {
+    padding: 0;
+    margin: 0;
+}
+
+.right-side {
+    color: white;
+    width: 55%;
+    border: 1.5px solid white;
+    padding: 0.5rem;
+    border-radius: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-top: 0.6rem;
+}
+
+.right-side p {
+    padding: 0;
+    margin: 0;
+    font-size: 0.8rem;
+}
+
+.r-top b {
+    font-size: 1rem;
+}
+
+.r-bot {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+.r-bot p:last-child{
+    background-color: #73B065;
+    padding: 0.2rem 1rem;
+    border-radius: 1rem;
+}
+.r-bot p:last-child{
+    color: white;
+    font-weight: 600;
+}
+
+.bottom-case button {
+    text-align: start;
+    padding: 0.5rem 0.8rem;
+    border-radius: 1rem;
+    background-color: #222B2D ;
+    border: 1px solid white;
+    color: white;
+}
+
+.bottom-case button:last-child {
+    margin-top: 0.5rem;
+    background: linear-gradient(to right, #222B2D, #73B065);
+}
+
+
+.viewAll{
+    font-weight: bold;
+    color: blue;
+    font-size: 0.8rem;
+}
+
+

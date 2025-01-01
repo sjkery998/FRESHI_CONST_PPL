@@ -1,0 +1,91 @@
+.profilePage {
+    width: 100vw;
+    padding-top: 4.1rem;
+}
+
+/* Logo Section */
+.profilePageLogoCase {
+    width: calc(100% - 2rem);
+    height: 2rem;
+    padding: 1rem;
+    background-color: white;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+    align-items: end;
+    position: fixed;
+    z-index: 10;
+}
+
+
+/* content */
+
+.topProfContent {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    padding: 1.5rem 1.5rem;
+    align-items: center;
+}
+
+.topProfContent .profileImage {
+    width: 60px;
+    height: 60px;
+    background-color: black;
+    border-radius: 50px;
+}
+
+.topProfContent .profileDetails {
+    display: flex;
+    flex-direction: column;
+}
+
+.profileDetails b {
+    margin: 0;
+    padding: 0;
+    font-size: 0.7rem;
+}
+
+.botProfContent {
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem 1.5rem;
+    font-size: 0.9rem;
+}
+
+.profileOptions {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    border-bottom: 0.5px solid grey;
+    padding: 1rem 0;
+}
+
+.profileArrowRight {
+    margin-left: auto;
+}
+
+.footerProfile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem;
+}
+
+.footerProfile h1 {
+    padding: 0;
+    margin: 0;
+    font-weight: 800;
+    display: inline-block;
+    background: linear-gradient(to right, rgb(102, 208, 102), rgb(99, 99, 99));
+    background-clip:content-box;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.footerProfile b {
+    color: grey;
+    font-size: 0.7rem;
+}

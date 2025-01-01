@@ -1,0 +1,51 @@
+.notificationHead{
+    width: calc(100% - 2rem);
+    height: 2rem;
+    padding: 1rem;
+    background-color: white;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    font-weight: bold;
+    font-size: 1rem;
+    align-items: end;
+    border-bottom: 1px solid grey;
+    position: fixed;
+}
+
+.notificationHead svg{
+    font-size: 1.2rem;
+}
+
+.notifContainer{
+    display: flex;
+    flex-direction: column;
+    padding-top: 68px;
+    gap: 0.2rem;
+    background-color: rgb(252, 252, 252);
+}
+.notifCase{
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    align-items: start;
+    min-height: calc(75px - 1rem);
+}
+
+.notifCase p, .notifCase b{
+    padding: 0;
+    margin: 0;
+    max-lines: 2;
+    line-clamp: 2;
+}
+.notifMessage{
+    padding-left: 0.5rem;
+    border-left: 3px solid grey;
+    flex: 1;
+}
+.notifTime{
+    font-size: 0.7rem;
+    font-weight: 400;
+    text-align: end;
+}

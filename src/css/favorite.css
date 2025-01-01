@@ -1,0 +1,238 @@
+.FavoritePage {
+    width: 100vw;
+}
+
+.FavHeading {
+    position: fixed;
+    width: 100%;
+    background-color: white;
+}
+
+.container {
+    padding-top: 100px;
+}
+
+/* Logo Section */
+.FavoritePageLogoCase {
+    height: 2rem;
+    padding: 1rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+    align-items: end;
+}
+
+.favSwitch {
+    border-bottom: 0.1px solid rgb(165, 165, 165);
+
+    height: 2rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+    gap: 2rem;
+    padding-left: 2rem;
+}
+
+.favSwitch p {
+    height: 100%;
+    text-align: center;
+    line-height: 2rem;
+    color: black;
+    font-weight: 400;
+}
+
+.favSwitch p.active {
+    border-bottom: 1px solid #73B065;
+    color: #73B065;
+}
+
+.cardCase {
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid grey;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.cardCase .storeCase {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.favStoreCase {
+    border-bottom: none;
+    box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.storeCase b,
+.storeCase p {
+    padding: 0;
+    margin: 0;
+}
+
+.storeCase .leftSide {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.storeCase .leftSide b {
+    font-size: 1rem;
+}
+
+.storeCase .leftSide div {
+    font-size: 0.7rem;
+}
+
+.storeCase .leftSide p:last-child {
+    border: 0.5px solid #73B065;
+    color: #73B065;
+    border-radius: 0.3rem;
+    text-align: center;
+    font-size: 0.7rem;
+    padding: 0.2rem;
+    width: 4rem;
+    margin: 0;
+}
+
+.storeCase .rightSide {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+}
+
+.storeCase .rightSide p {
+    font-size: 0.8rem;
+}
+
+.favStoreLside {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.favStoreLside div:last-child {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.favStoreLside p {
+    font-size: 0.8rem;
+    font-weight: 400;
+}
+
+.favStoreLside p:last-child {
+    border: 0.5px solid #73B065;
+    color: grey;
+    border-radius: 0.3rem;
+    text-align: center;
+    font-size: 0.7rem;
+    padding: 0.2rem;
+    min-width: 6rem;
+    margin: 0;
+}
+
+.favStoreLside b {
+    font-size: 1rem;
+}
+
+.storePic {
+    width: 50px;
+    height: 50px;
+    background-color: black;
+    border-radius: 50%;
+    /* Membuat lingkaran sempurna */
+    overflow: hidden;
+    /* Menjaga agar gambar tidak keluar dari lingkaran */
+    display: flex;
+    /* Untuk memusatkan gambar */
+    align-items: center;
+    justify-content: center;
+}
+
+.storePic img {
+    width: 100%;
+    /* Gambar memenuhi kontainer */
+    height: 100%;
+    /* Gambar mengikuti ukuran kontainer */
+    object-fit: cover;
+    /* Menjaga proporsi gambar tanpa terdistorsi */
+}
+
+
+.separator {
+    border-bottom: 1px dotted grey;
+}
+
+
+.FavProductCase {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.FavProductCase p {
+    font-size: 0.8rem;
+    font-weight: 400;
+}
+
+.FavProductCase b,
+.FavProductCase p {
+    padding: 0;
+    margin: 0;
+}
+
+.FavProductCase b {
+    font-size: 1rem;
+}
+
+.FavProductCase .details p:last-child {
+    font-size: 0.7rem;
+}
+
+.FavProductCase .details {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    justify-content: space-between;
+}
+
+#btnFav {
+    font-size: 1.8rem;
+    cursor: pointer;
+    color: gray;
+    transition: color 0.3s ease;
+}
+
+#btnFav.favorited {
+    color: red;
+}
+
+.FavProductCase .rightSide {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.FavProductCase .rightSide img {
+    width: 120px;
+    height: 120px;
+    background-color: black;
+    border-radius: 1rem;
+}
+
+.FavProductCase .rightSide button {
+    padding: 0.5rem 0.5rem;
+    border-radius: 0.5rem;
+    background-color: #5fb14c;
+    color: white;
+    font-weight: bold;
+    border: none;
+}

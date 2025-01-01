@@ -1,0 +1,301 @@
+p {
+    font-weight: 300;
+}
+
+.newProduct {
+    height: 15rem;
+
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    gap: 1rem;
+    overflow: hidden;
+}
+
+.newProduct p,
+.newProduct b,
+.storeContainer p,
+.storeContainer b {
+    padding: 0;
+    margin: 0;
+    font-size: 0.8rem;
+}
+
+.newProduct .headline {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.headline .title {
+    font-weight: 300;
+}
+
+.newProduct .contents {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.newProduct .productCase {
+    height: 98%;
+    width: 8rem;
+    overflow: hidden;
+    border-radius: 1rem;
+    background-color: white;
+    border: 0.1px solid grey;
+    box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.2);
+    flex-shrink: 0;
+}
+
+.newProduct .imageCase {
+    height: 60%;
+    background-color: grey;
+}
+
+.newProduct .details {
+    display: flex;
+    flex-direction: column;
+    padding: 0.3rem;
+    gap: 1rem;
+}
+
+.newProduct .price {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.newProduct .price p:last-child {
+    font-size: 0.7rem;
+    color: #73B065;
+    font-weight: bold;
+}
+
+.newProduct .rating {
+    display: flex;
+    flex-direction: row;
+    margin-top: 0.2rem;
+}
+
+.Products {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    gap: 1rem;
+    overflow: hidden;
+}
+
+.Products p,
+.Products b,
+.storeContainer p,
+.storeContainer b {
+    padding: 0;
+    margin: 0;
+    font-size: 0.8rem;
+}
+
+.Products .headline {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.Products .contents {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    gap: 0.4rem;
+    justify-content: space-between;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    flex-wrap: wrap;
+}
+
+.Products .productCase {
+    display: flex;
+    flex-direction: column;
+    height: 15rem;
+    margin-bottom: 0.5rem;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    background-color: white;
+    border: 0.5px solid grey;
+    box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.2);
+    padding: 0.2rem;
+    @media (max-width: 490px) {
+        width: calc((100vw / 2) - 2.4rem);
+    }
+    @media (max-width: 430px) {
+        width: calc((100vw / 1.9) - 2.4rem);
+    }
+
+    @media (max-width: 300px) {
+        width: 14rem;
+    }
+}
+
+.Products .imageCase {
+    flex: 1;
+    background-color: grey;
+    border-radius: 0.3rem;
+}
+
+.Products .details {
+    display: flex;
+    flex-direction: column;
+    padding: 0.2rem;
+    gap: 1rem;
+}
+
+.priceRating {
+    margin-top: auto;
+}
+
+.Products .details div:first-child > p:nth-child(2) {
+    font-weight: 400;
+}
+.Products .details p {
+    margin: 0;
+    padding: 0;
+    font-size: 0.7rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    word-wrap: break-word;
+}
+
+
+.Products .price {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.Products .price p:last-child {
+    color: white;
+    background-color: #73B065;
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.5rem;
+    font-weight: bold;
+}
+
+.Products .rating {
+    display: flex;
+    flex-direction: row;
+    margin-top: 0.2rem;
+}
+
+.storeContainer {
+    height: 7rem;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    gap: 1rem;
+    overflow: hidden;
+
+}
+
+.storeContainer .contents {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    height: 99%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.storeContainer .headline {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.storeContainer .storeCase {
+    width: calc(20rem - 1rem);
+    height: calc(99% - 1rem);
+    display: flex;
+    flex-direction: row;
+    background-color: #222B2D;
+    color: white;
+    border-radius: 1rem;
+    padding: 0.5rem 0.7rem;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.storeContainer .leftContent {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.storeContainer .leftContent p {
+    font-size: 0.7rem;
+}
+
+.storeContainer .image {
+    width: 50px;
+    height: 50px;
+    background-color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; /* Mencegah konten meluap keluar dari lingkaran */
+}
+
+.storeContainer .image img {
+    width: 100%; /* Gambar menyesuaikan ukuran container */
+    height: 100%; /* Gambar menyesuaikan ukuran container */
+    object-fit: cover; /* Memastikan gambar tidak terdistorsi */
+    border-radius: 50%;
+}
+
+.storeContainer .rightContent {
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+    gap: 0.2rem;
+}
+
+.storeContainer .rightContent p {
+    background-color: #649a58;
+    color: white;
+    padding: 0.4rem 0.5rem;
+    border-radius: 0.8rem;
+    font-weight: 500;
+}
+
+
+.simpleHeaderPage{
+    width: calc(100% - 2rem);
+    height: 2rem;
+    padding: 1rem;
+    background-color: white;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    font-weight: bold;
+    font-size: 1rem;
+    align-items: end;
+    z-index: 10;
+    border-bottom: 1px solid grey;
+    position: fixed;
+}
+.simpleHeaderPage svg{
+    font-size: 1.2rem;
+}

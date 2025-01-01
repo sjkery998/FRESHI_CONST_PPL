@@ -1,0 +1,174 @@
+.mainStorCase p, .mainStorCase b{
+    padding: 0;
+    margin: 0;
+    font-size: 0.8rem;
+    font-weight: 400;
+}
+.StoreDetailLogoCase b {
+    position: absolute;
+    padding: 0;
+    width: auto;
+    text-align: center;
+    /* line-height: 0; */
+}
+
+.StoreDetailLogoCase {
+    width: calc(100% - 2rem);
+    height: 2rem;
+    padding: 1rem;
+    background-color: rgba(255, 255, 255, 0.142); /* Warna transparan */
+    backdrop-filter: blur(3px); /* Efek blur pada background */
+    -webkit-backdrop-filter: blur(1px); /* Dukungan untuk Safari */
+    display: flex;
+    flex-direction: row;
+    font-weight: bold;
+    font-size: 1rem;
+    align-items: end;
+    justify-content: center;
+    position: fixed;
+    z-index: 10;
+    color: black;
+}
+
+.StoreDetailLogoCase > :first-child{
+    margin-right: auto;
+}
+
+.mainStorCase{
+    display: flex;
+    flex-direction: column;
+}
+.storeBackgroudCase {
+    height: 14rem;
+    background: white;
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; /* Memotong bagian gambar yang melampaui container */
+}
+
+.storeBackgroudCase img {
+    width: 100%;
+    height: 100%; 
+    object-fit: cover; /* Memastikan gambar memenuhi container tanpa distorsi */
+    object-position: center; /* Memusatkan gambar jika harus dipotong */
+}
+
+.storeDetailCase{
+    display: flex;
+    flex-direction: column;
+    padding: 1.2rem;
+    position: relative;
+    gap: 1.2rem;
+    background-color: #222B2D;
+    color: white;
+}
+.storeDetailAvatar{
+    width: 5rem;
+    height: 5rem;
+    background-color: green;
+    border-radius: 3rem;
+    top: -4rem;
+    position: absolute;
+    overflow: hidden;
+    border: 1px solid white;
+}
+.storeDetailAvatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Gambar menyesuaikan lingkaran tanpa distorsi */
+    border-radius: 50%; /* Memastikan gambar berbentuk lingkaran */
+    display: block; /* Menghilangkan spasi bawaan dari elemen img */
+}
+.storeDetailHeadCase{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+.storeDetailHeadline{
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+.lineSeparator{
+    border-right: 1px solid white;
+}
+.storeDetailHeadline b{
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+.storeDetailHeadline p{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.2rem;
+}
+.storeDetailInfo{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.storeDetailInfo div{
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+.storeDetailInfo div b{
+    font-size: 0.9rem;
+    font-weight: 400;
+}
+.storeSearchCase{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    gap: 1rem;
+}
+.storeSearchCase .sSearchBox{
+    flex-grow: 1;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+    border-radius: 2rem;
+    border: 1px solid white;
+    background-color: white;
+    align-items: center;
+    position: relative;
+    padding-right: 1.8rem;
+}
+.storeSearchCase input{
+    flex-grow: 1;
+    outline: none;
+    border: none;
+    padding: 0 0.8rem;
+    padding-left: 2.2rem;
+}
+
+.sFavoriteBox, .storeChatBox{
+    padding: 0.7rem 0.8rem;
+    background-color: rgb(244, 244, 219);
+    color: black;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 2rem;
+}
+.sFavoriteBox b,.storeChatBox b{
+    font-weight: 600;
+    font-size: 0.9rem;
+    line-height: 0;
+}
+
+.sSboxMag{
+    position: absolute;
+    left: 0.9rem;
+    color: black;
+}
+.sSboxLemon{
+    position: absolute;
+    right: 0.9rem;
+    color: #009c5b;
+}

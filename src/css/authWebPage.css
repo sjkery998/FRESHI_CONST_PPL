@@ -1,0 +1,178 @@
+.authPageContainer {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url("/images/wood.jpg");
+    display: flex;
+    flex-direction: column;
+    background-size: cover;
+    background-position: center;
+}
+
+.authPageContainer b,
+.authPageContainer p,
+.authPageContainer h1 {
+    padding: 0;
+    margin: 0;
+    text-align: center;
+}
+
+.authBounceImageCase {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* background-color: #01AC66; */
+}
+
+.authBounceImageCase img {
+    width: 12rem;
+    height: 12rem;
+    animation: bounceUp 1s ease-out;
+}
+
+@keyframes bounceUp {
+    0% {
+        transform: translateY(500%);
+        opacity: 0;
+    }
+
+    50% {
+        transform: translateY(-10%);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
+
+
+.authContainer {
+    display: flex;
+    flex-direction: column;
+    transition: 0.5s;
+    background-color: whitesmoke;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+}
+
+.authOptions {
+    padding: 2rem 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.authOptions h1{
+    font-size: 1.5rem;
+    padding: 0.5rem;
+    margin: 0;
+    line-height: 0;
+}
+.authContainer p {
+    font-weight: 400;
+    font-size: 0.9rem;
+    padding: 0 1rem;
+}
+
+.authEmailCase p,
+.authGoogleCase p,
+.authSkipLogin p {
+    font-weight: 400;
+}
+
+.authEmailCase,
+.authGoogleCase,
+.authSkipLogin {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    line-height: 0;
+    padding: 1.3rem 2rem;
+    border-radius: 2rem;
+    background-color: white;
+    min-width: 70%;
+    position: relative;
+    border: 1px solid white;
+}
+
+.authEmailCase svg,
+.authGoogleCase svg,
+.authSkipLogin svg {
+    position: absolute;
+    left: 0;
+    padding-left: 1rem;
+}
+
+.authEmailCase {
+    background-color: #01AC66;
+    color: white;
+}
+.authWithEmail{
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    width: calc(100% - 3rem);
+    min-height: 200px;
+    transition: 0.5s;
+}
+.authWithEmail svg{
+    font-size: 3rem;
+}
+.authWithEmail b{
+    font-size: 1.2rem;
+}
+.authWithEmail b, .authWithEmail p{
+    padding: 0;
+    margin: 0;
+    text-align: start;
+    margin-bottom: 10px;
+}
+.authWithEmail input{
+    padding: 1rem;
+    border: 1px solid black ;
+    border-radius: 0.5rem;
+    margin-bottom: 10px;
+}
+.authWithEmail .authRegButton{
+    background-color: #01AC66;
+    color: white;
+    border-radius: 1rem;
+    line-height: 0;
+    padding: 1.1rem;
+    margin-top: auto;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+.authToLogin{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    padding: 0;
+    margin: 0;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #01AC66;
+}
+.authHeadButton b{
+    font-size: 0.9rem;
+    line-height: 2;
+}
+.authHeadButton{
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+}
+
+.freshILogo{
+    font-size: 4rem;
+    font-weight: 900;
+    background: linear-gradient(to right, rgb(102, 208, 102), rgb(15, 15, 15));
+    background-clip:content-box;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}

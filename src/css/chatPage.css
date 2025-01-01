@@ -1,0 +1,80 @@
+.chatPageHeading{
+    position: fixed;
+    width: 100%;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+    border-bottom: 1px solid grey;
+}
+.chatPageHead{
+    height: 2rem;
+    padding: 1rem 1rem 1rem 1rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    font-weight: bold;
+    font-size: 1rem;
+    align-items: end;
+}
+.chatChangeType b{
+    padding: 0;
+    margin: 0;
+    font-size: 0.8rem;
+    font-weight: 400;
+    padding: 0.5rem 0;
+}
+.chatChangeType{
+    display: flex;
+    gap: 1rem;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+.chatPageHead svg{    
+    font-size: 1.2rem;
+}
+.chatCaseContainer{
+    display: flex;
+    flex-direction: column;
+    padding-top: 100px;
+    gap: 0.2rem;
+    background-color: rgb(252, 252, 252);
+}
+.chatsCase{
+    display: flex;
+    flex-direction: row;
+    /* border-bottom: 1px solid grey; */
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    align-items: center;
+    border-top-left-radius: 5rem;
+    border-bottom-left-radius: 5rem;
+}
+.chatsCase .chatInfos{
+    margin-left: auto;
+}
+.chatsCase p, .chatsCase b{
+    padding: 0;
+    margin: 0;
+}
+.chatsCase{
+    font-size: 0.9rem;
+    max-lines: 2;
+    line-clamp: 2;
+}
+.chatsCase img{
+    width: 50px;
+    height: 50px;   
+}
+.chatOutMess{
+    padding-left: 0.5rem;
+    border-left: 1px solid black;
+    flex: 1;
+}
+.chatLastTime{
+    font-size: 0.7rem;
+    font-weight: 400;
+    text-align: end;
+}
