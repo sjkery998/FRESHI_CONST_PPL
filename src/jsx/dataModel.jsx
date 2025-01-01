@@ -1,3 +1,5 @@
+//struktur belom di cocokin sama firebase, lagi mau di buat
+
 const productsData = [
     { id: "prod1", name: 'Apel Merah', weight: '1kg', price: 'Rp.45000', rating: '4.5', image: '/images/apple-green.jpg', desc: "Apel Merah segar dengan rasa manis yang khas", storeName: "Pak Joko Garden" },
     { id: "prod2", name: 'Apel Kuning', weight: '1kg', price: 'Rp.50000', rating: '4.7', image: '/images/apple-green.jpg', desc: "Apel Kuning segar, sangat cocok untuk jus", storeName: "Toko Buah Sehat" },
