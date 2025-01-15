@@ -7,10 +7,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useNavigate } from 'react-router-dom';
 import { productsData, storesData } from '../jsx/dataModel.jsx';
 import Transition from '../components/transition.jsx';
+import { FaStar } from 'react-icons/fa6';
 // Komponen untuk Toko
 
 
 function Home() {
+
     const navigate = useNavigate();
     const toDetailProduct = (event) => {
         const productId = event.target.closest('.productCase').id.split('-')[1];
@@ -20,19 +22,19 @@ function Home() {
         const storeId = event.target.closest(".storeCase").id.split('-')[1];
         navigate(`/StoreDetail?storeId=${storeId}`);
     }
-    const Store = ({ name, category, rating, storeId }) => (
-        <div className="storeCase" id={"store-" + storeId} onClick={toDetailStore}>
+    const Store = ({ StoreName, category, rating, StoreId }) => (
+        <div className="storeCase" id={"store-" + StoreId} onClick={toDetailStore}>
             <div className="leftContent">
                 <div className="image">
                     <img src="/images/storeAvatar.png" alt="" />
                 </div>
                 <div className="details">
-                    <b>{name}</b>
+                    <b>{StoreName}</b>
                     <p>{category}</p>
                 </div>
             </div>
             <div className="rightContent">
-                <b>{rating}</b>
+                <b style={{display:"flex", flexDirection:"row", alignItems:"center", gap:"0.1rem", lineHeight:"1",}}>{rating.rating} <FaStar style={{lineHeight:"0", color: "orange"}}></FaStar></b>
                 <p style={{
                     userSelect: 'none',
                     WebkitUserSelect: 'none',
@@ -43,10 +45,10 @@ function Home() {
         </div>
     );
 
-    const toProfle=()=>{
-        navigate("/Profile");
+    const toProfle = () => {
+        // navigate("/Profile");
     }
-    const toProcut=()=>{
+    const toProduct = () => {
         navigate("/Product");
     }
 
@@ -88,7 +90,7 @@ function Home() {
                         </div>
                     </div>
                     <div className="bottom-case">
-                        <button onClick={toProcut}>Belanja <FontAwesomeIcon icon={faShoppingBag} /></button>
+                        <button onClick={toProduct}>Belanja <FontAwesomeIcon icon={faShoppingBag} /></button>
                         <br />
                         <button onClick={toProfle}>Bergabung Mitra Sekarang <FontAwesomeIcon icon={faHandshake} /></button>
                     </div>
@@ -96,23 +98,23 @@ function Home() {
 
                 <div className="newProduct">
                     <div className="headline">
-                        <div className="title">Buah-Buahan Terbaru</div>
+                        <div className="title">Untuk Anda</div>
                         <div className="viewAll">Selengkapnya</div>
                     </div>
                     <div className="contents">
-                        {productsData.map((product, index) => (
-                            <div className="productCase" key={product.id + 'a'} id={"new-" + product.id} onClick={toDetailProduct}>
-                                <div className="imageCase" style={{ backgroundImage: `url(${product.image})` }}></div>
+                        {Object.entries(productsData).map(([key, products]) => (
+                            <div className="productCase" key={key + 'a'} id={"new-" + products.id} onClick={toDetailProduct}>
+                                <div className="imageCase" style={{ backgroundImage: `url(${products.image})` }}></div>
                                 <div className="details">
-                                    <b>{product.name}</b>
+                                    <b>{products.name}</b>
                                     <div className="priceRating">
                                         <div className="price">
-                                            <p>{product.weight}</p>
-                                            <p>{product.price}</p>
+                                            <p>{String(products.quantity).split("|")[0]}Kg</p>
+                                            <p>Rp.{products.price}</p>
                                         </div>
                                         <div className="rating">
-                                            <p>#</p>
-                                            <p>{product.rating}</p>
+                                            <FaStar style={{ color: "orange" }} />
+                                            <p>{products.rating.Rating}</p> {/* Mengakses product.rating.Rating */}
                                         </div>
                                     </div>
                                 </div>
@@ -127,19 +129,19 @@ function Home() {
                         <div className="viewAll">Selengkapnya</div>
                     </div>
                     <div className="contents">
-                        {productsData.map((products2, index) => (
-                            <div className="productCase" key={products2.id + 'b'} id={"new-" + products2.id} onClick={toDetailProduct}>
+                        {Object.entries(productsData).map(([key, products2]) => (
+                            <div className="productCase" key={key + 'a'} id={"new-" + products2.id} onClick={toDetailProduct}>
                                 <div className="imageCase" style={{ backgroundImage: `url(${products2.image})` }}></div>
                                 <div className="details">
                                     <b>{products2.name}</b>
                                     <div className="priceRating">
                                         <div className="price">
-                                            <p>{products2.weight}</p>
-                                            <p>{products2.price}</p>
+                                            <p>{String(products2.quantity).split("|")[0]}Kg</p>
+                                            <p>Rp.{products2.price}</p>
                                         </div>
                                         <div className="rating">
-                                            <p>#</p>
-                                            <p>{products2.rating}</p>
+                                            <FaStar style={{ color: "orange" }} />
+                                            <p>{products2.rating.Rating}</p> {/* Mengakses product.rating.Rating */}
                                         </div>
                                     </div>
                                 </div>
@@ -154,20 +156,22 @@ function Home() {
                         <div className="viewAll">Selengkapnya</div>
                     </div>
                     <div className="contents">
-                        {storesData.map((store, index) => (
-                            <Store key={index} {...store} />
+                        {Object.entries(storesData).map(([key, store]) => (
+                            <Store key={key + "s"} {...store} />
                         ))}
                     </div>
                 </div>
 
                 <div className="Products">
                     <div className="headline">
-                        <div className="title">Buah-Buahan Terbaru</div>
-                        <div className="viewAll">Selengkapnya</div>
+                        <div className="title">Temukan</div>
+                        <div className="viewAll"
+                            onClick={toProduct}
+                        >Selengkapnya</div>
                     </div>
                     <div className="contents">
-                        {productsData.map((products, index) => (
-                            <div className="productCase" key={products.id + 'c'} id={"prod-" + products.id} onClick={toDetailProduct}>
+                        {Object.entries(productsData).map(([key, products]) => (
+                            <div className="productCase" key={key + 'c'} id={"prod-" + products.id} onClick={toDetailProduct}>
                                 <div className="imageCase" style={{ backgroundImage: `url(${products.image})` }}></div>
                                 <div className="details">
                                     <div>
@@ -177,12 +181,12 @@ function Home() {
                                     </div>
                                     <div className="priceRating">
                                         <div className="price">
-                                            <p>{products.weight}</p>
-                                            <p>{products.price}</p>
+                                            <p>{String(products.quantity).split("|")[0]}Kg</p>
+                                            <p>Rp.{products.price}</p>
                                         </div>
                                         <div className="rating">
-                                            <p>#</p>
-                                            <p>{products.rating}</p>
+                                            <FaStar style={{ color: "orange" }} />
+                                            <p>{products.rating.Rating}</p>
                                         </div>
                                     </div>
                                 </div>

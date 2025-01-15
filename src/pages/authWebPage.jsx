@@ -1,11 +1,47 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FaArrowLeft, FaArrowRight, FaGoogle } from "react-icons/fa6";
 import { MdOutlineEmail } from "react-icons/md";
 import "../css/authWebPage.css";
 import { useNavigate } from "react-router-dom";
+import { initialRegisterPayload, initialLoginPayload, initialResetPassPayload, handlePayloadChange, getOnSubmitHandler } from "../jsx/authHandler";
+import { useAuth } from "../context/auth/authcontext";
 
 function AuthWebPage() {
+    const { userLoggedIn } = useAuth();
     const navigate = useNavigate();
+    const [authType, setAuthType] = useState('register');
+    const [formPayload, setFormPayload] = useState(initialRegisterPayload);
+    
+    const [isDelay, setIsDelay] = useState(false);
+    const loadingRef = useRef(null);
+
+    const emailRef = useRef(null);
+    const usernameRef = useRef(null);
+    const passwordRef = useRef(null);
+
+    const formInputRefs = {
+        email: emailRef,
+        username: usernameRef,
+        password: passwordRef,
+    };
+
+    const handleAuthTypeChange = (type) => {
+        setAuthType(type);
+        switch (type) {
+            case 'register':
+                setFormPayload(initialRegisterPayload);
+                break;
+            case 'login':
+                setFormPayload(initialLoginPayload);
+                break;
+            case 'resetPassword':
+                setFormPayload(initialResetPassPayload);
+                break;
+            default:
+                break;
+        }
+    };
+
 
     const [isForgotPass, setIsForgotPass] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
@@ -22,11 +58,12 @@ function AuthWebPage() {
 
     const backToHome = () => {
         const lastPage = sessionStorage.getItem("lastBeforeLogin");
-        if (lastPage) {
-            navigate(`/${lastPage.split("/").filter(Boolean).pop()}`);
+        if (lastPage && lastPage.split("/").filter(Boolean).pop() !== "profile" && lastPage.split("/").filter(Boolean).pop() !== "AuthWebPage") {
+            navigate(`/${lastPage.split("/").filter(Boolean).pop()}`, { state: { fromAuth: true } });
             sessionStorage.removeItem("lastBeforeLogin");
         } else {
             navigate(`/`);
+            sessionStorage.removeItem("lastBeforeLogin");
         }
     };
 
@@ -38,7 +75,32 @@ function AuthWebPage() {
         }
     };
 
+    const LoadingDelayAuth = (
+        <div
+            ref={loadingRef}
+          className="loadingDelayAuth"
+          style={{
+            position: "absolute",
+            zIndex: 10,
+            height: `${window.innerHeight}px`,
+            width: `${window.innerWidth}px`,
+            backgroundColor: "rgba(136, 136, 136, 0.45)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <center>Loading...</center>
+        </div>
+      );
+      
+
     useEffect(() => {
+        if (userLoggedIn) {
+            navigate("/");
+            sessionStorage.clear();
+            console.log("authenticated")
+        }
         const authContainer = document.querySelector(".authContainer");
         if (authContainer) {
             const resizeObserver = new ResizeObserver(updateAuthBounceImageHeight);
@@ -84,9 +146,16 @@ function AuthWebPage() {
                                 ? `calc(${window.innerHeight}px - 2rem)`
                                 : `calc(${window.innerHeight}px - 2rem)`,
                         }}
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            if (isDelay === false) {
+                                setIsDelay(true);
+                                getOnSubmitHandler(authType, formPayload, navigate, formInputRefs, loadingRef)();
+                            }
+                        }}
                     >
                         <div className="authHeadButton">
-                            <b onClick={handleExpand}>Kembali</b>
+                            <b onClick={() => { handleExpand(); setIsForgotPass(false) }}>Kembali</b>
                         </div>
                         <div
                             style={{
@@ -100,79 +169,93 @@ function AuthWebPage() {
                             <p>Suplai marketnya buah-buahan segar</p>
                         </div>
                         <input
-                            disabled={isForgotPass}
                             type="email"
-                            placeholder="Masukan email anda"
+                            placeholder={isForgotPass ? "Masukan email Terdaftar" : "Masukan email anda"}
                             required
                             onInvalid={(e) =>
                                 e.target.setCustomValidity(
                                     "Email harus valid, contoh: user@example.com"
                                 )
                             }
-                            onInput={(e) => e.target.setCustomValidity("")}
+                            value={formPayload.email || ""}
+                            onChange={(e) => {
+                                e.target.setCustomValidity("");
+                                setFormPayload({ ...formPayload, email: e.target.value });
+                            }}
+                            ref={emailRef}
                         />
+
                         <input
                             disabled={isForgotPass}
                             type="text"
                             placeholder="Masukkan nama anda"
-                            style={{ display: toggleAuth ? "" : "none" }}
-                            required={toggleAuth}
+                            style={{ display: !isForgotPass ? toggleAuth ? "" : "none" : "none" }}
+                            {...(!true ? { "required": toggleAuth } : {})}
                             onInvalid={(e) =>
-                                e.target.setCustomValidity("Nama wajib diisi!")
+                                (!isForgotPass) ? e.target.setCustomValidity("Nama wajib diisi!") : null
                             }
-                            onInput={(e) => e.target.setCustomValidity("")}
+                            value={(formPayload.username) ? formPayload.username : ""}
+                            onChange={(e) => {
+                                e.target.setCustomValidity("");
+                                setFormPayload({ ...formPayload, username: e.target.value });
+                            }}
+                            ref={usernameRef}
                         />
                         <input
                             disabled={isForgotPass}
                             type="password"
+                            style={{ display: toggleAuth ? "" : !isForgotPass ? "" : "none", }}
                             placeholder={!toggleAuth ? "Masukkan Password" : "Buat Password Baru"}
                             required
                             onInvalid={(e) =>
                                 e.target.setCustomValidity("Password harus diisi!")
                             }
-                            onInput={(e) => e.target.setCustomValidity("")}
+                            value={(formPayload.password) ? formPayload.password : ""}
+                            onChange={(e) => {
+                                e.target.setCustomValidity("");
+                                setFormPayload({ ...formPayload, password: e.target.value });
+                            }}
+                            ref={passwordRef}
                         />
-                        <p
-                            style={{ padding: "0 0.3rem", color: "blue", fontWeight: "500" }}
-                            onClick={() => setIsForgotPass(!isForgotPass)}
-                        >
-                            Lupa kata sandi?
-                        </p>
-                        {isForgotPass && (
-                            <div className="authWithEmail resetPassword" style={{ display: isForgotPass ? "flex" : "none", padding: "0", width: "100%", minHeight: isForgotPass ? "0" : "" }}>
-                                <input
-                                    type="email"
-                                    placeholder="Masukan Email Terdaftar"
-                                    required
-                                    onInvalid={(e) =>
-                                        e.target.setCustomValidity("Harus diisi!")
-                                    }
-                                    onInput={(e) => e.target.setCustomValidity("")}
-                                />
-                                <input
-                                    type="submit"
-                                    value="Reset Password"
-                                    className="authRegButton resetPassword"
-                                />
-                            </div>
-                        )}
+                        {(!toggleAuth && !isForgotPass) ? (
+                            <p
+                                style={{ padding: "0 0.3rem", color: "blue", fontWeight: "500" }}
+                                onClick={() => {
+                                    setIsForgotPass(!isForgotPass);
+                                    handleAuthTypeChange('resetPassword');
+                                }}
+                            >
+                                Lupa kata sandi?
+                            </p>
+                        ) : null}
+
                         <input
-                            disabled={isForgotPass}
                             type="submit"
-                            value={toggleAuth ? "Mendaftar" : "Masuk"}
+                            value={toggleAuth ? "Mendaftar" : isForgotPass ? "Reset Password" : "Masuk"}
                             className="authRegButton"
                         />
-                        <div className="authToLogin" onClick={() => setToggleAuth(!toggleAuth)}>
-                            <p style={{ margin: "0", padding: "0", lineHeight: "0", color: "black" }}>
-                                {toggleAuth ? "Sudah Punya Akun?" : "Belum Punya Akun?"}
-                            </p>
-                            {toggleAuth ? "Masuk" : "Daftar Disini"}
-                        </div>
+                        {toggleAuth ? (
+                            <div className="authToLogin" onClick={() => { setToggleAuth(!toggleAuth); setIsForgotPass(false); handleAuthTypeChange('login') }}>
+                                <p style={{ margin: "0", padding: "0", lineHeight: "0", color: "black" }}>
+                                    Sudah Punya Akun?
+                                </p>
+                                Masuk
+                            </div>
+                        ) : (
+                            <div className="authToLogin" onClick={() => { setToggleAuth(!toggleAuth); setIsForgotPass(false); handleAuthTypeChange('register') }}>
+                                <p style={{ margin: "0", padding: "0", lineHeight: "0", color: "black" }}>
+                                    Belum Punya Akun?
+                                </p>
+                                Daftar Disini
+                            </div>
+                        )}
                     </form>
                 )}
             </div>
+            {isDelay && LoadingDelayAuth}
         </div>
     );
+
 }
 
 export default AuthWebPage;

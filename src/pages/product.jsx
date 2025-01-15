@@ -7,60 +7,72 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { productsData, storesData } from '../jsx/dataModel.jsx';
 import { useNavigate } from 'react-router-dom';
 import Transition from '../components/transition.jsx';
-
+import { FaStar } from 'react-icons/fa6';
 
 function Product() {
     const navigate = useNavigate();
-
     const toDetailProduct = (event) => {
         const productId = event.target.closest('.productCase').id.split('-')[1];
         navigate(`/ProductDetail?productId=${productId}`);
     };
-
     const toDetailStore = (event) => {
         const storeId = event.target.closest(".storeCase").id.split('-')[1];
         navigate(`/StoreDetail?storeId=${storeId}`);
     };
-
     const [searchQuery, setSearchQuery] = useState('');
     const [activeFilter, setActiveFilter] = useState('all');
 
-    const filteredResults = activeFilter === 'all'
-        ? [
-            ...productsData.filter(
-                product =>
-                    product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    product.storeName.toLowerCase().includes(searchQuery.toLowerCase())
-            ),
-            ...storesData.filter(store =>
-                store.name.toLowerCase().includes(searchQuery.toLowerCase())
+    const filteredProducts = Object.entries(productsData).filter(
+        ([key, product]) =>
+            Object.entries(product).some(value =>
+                String(value).toLowerCase().includes(searchQuery.toLowerCase())
             )
-        ]
-        : activeFilter === 'products'
-            ? productsData.filter(product =>
-                product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                product.storeName.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    const filteredStores = Object.entries(storesData).filter(
+        ([key, store]) =>
+            Object.entries(store).some(value =>
+                String(value).toLowerCase().includes(searchQuery.toLowerCase())
             )
-            : storesData.filter(store =>
-                store.name.toLowerCase().includes(searchQuery.toLowerCase())
-            );
+    );
+    const filteredResults =
+        activeFilter === 'all'
+            ? [
+                ...filteredProducts.map(([key, product]) => ({
+                    ...product,
+                    type: 'product',
+                    key: product.id,
+                })),
+                ...filteredStores.map(([key, store]) => ({
+                    ...store,
+                    type: 'store',
+                    key: store.storeId,
+                }))
+            ]
+            : activeFilter === 'products'
+                ? filteredProducts.map(([key, product]) => ({
+                    ...product,
+                    type: 'product',
+                    key: product.id,
+                }))
+                : filteredStores.map(([key, store]) => ({
+                    ...store,
+                    type: 'store',
+                    key: store.storeId,
+                }));
 
     let lastScrollTop = 0;
     const searchBarToFix = () => {
         const topLogoElement = document.querySelector('.ProductsPageLogoCase');
         const searchContainerElement = document.querySelector('.searchContainer');
         const prodElement = document.querySelector('.Products');
-
         if (topLogoElement && searchContainerElement) {
             const fixedRect = topLogoElement.getBoundingClientRect();
             const searchRect = searchContainerElement.getBoundingClientRect();
             const prodRect = prodElement.getBoundingClientRect();
-
             const isFixed = window.getComputedStyle(searchContainerElement).position === 'fixed';
             const isOverlap = !(fixedRect.bottom < searchRect.top || fixedRect.top > searchRect.bottom);
             const isBottomTouchingTop = searchRect.bottom <= (prodRect.top + 115);
             const currentScrollTop = window.scrollY;
-
             if (currentScrollTop > lastScrollTop && !isFixed) {
                 if (isOverlap) {
                     document.querySelector(".Products").setAttribute('style', "padding-top : 131.7px");
@@ -71,18 +83,15 @@ function Product() {
                 document.querySelector(".Products").removeAttribute('style');
                 searchContainerElement.removeAttribute('style');
             }
-
             lastScrollTop = currentScrollTop <= 0 ? 0 : currentScrollTop;
         }
     };
-
     useEffect(() => {
         window.addEventListener('scroll', searchBarToFix);
         return () => {
             window.removeEventListener('scroll', searchBarToFix);
         };
     }, []);
-
     return (
         <>
             <Transition />
@@ -114,7 +123,6 @@ function Product() {
                             <FontAwesomeIcon icon={faLemon} />
                         </button>
                     </form>
-
                     <div className="filters">
                         {[
                             { key: 'all', label: 'Semua' },
@@ -134,7 +142,6 @@ function Product() {
                             </button>
                         ))}
                     </div>
-
                 </div>
                 <div className="Products">
                     <div className="headline">
@@ -144,30 +151,36 @@ function Product() {
                     </div>
                     <div className="contents Results">
                         {filteredResults.length > 0 ? (
-                            filteredResults.map((item, index) => {
-                                if (item.storeId) {
+                            filteredResults.map((item) => {
+                                if (item.type === 'store') {
 
                                     return activeFilter !== 'products' ? (
-                                        <div className="storeCase" key={item.storeId + "st"} id={"store-" + item.storeId} onClick={toDetailStore}>
+                                        <div className="storeCase" key={`storeKey-` + item.StoreId} id={"store-" + item.StoreId} onClick={toDetailStore}>
                                             <div className="leftContent">
                                                 <div className="image">
                                                     <img src="/images/storeAvatar.png" alt="" />
                                                 </div>
-                                                <div className="details">
-                                                    <b>{item.name}</b>
+                                                <div className="details" style={{ gap: "0" }}>
+                                                    <b>{item.StoreName}</b>
+                                                    <p>Jumlah Produk: {item.Products.Total}</p>
                                                     <p>{item.category}</p>
                                                 </div>
                                             </div>
                                             <div className="rightContent">
-                                                <b>{item.rating}</b>
-                                                <p>Kunjungi Toko</p>
+                                                <b style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "0.1rem", lineHeight: "1", }}>{item.rating.rating} <FaStar style={{ lineHeight: "0", color: "orange" }}></FaStar></b>
+                                                <p style={{
+                                                    userSelect: 'none',
+                                                    WebkitUserSelect: 'none',
+                                                    MozUserSelect: 'none',
+                                                    msUserSelect: 'none'
+                                                }}>Kunjungi Toko</p>
                                             </div>
                                         </div>
                                     ) : null;
-                                } else {
+                                } else if (item.type === 'product') {
 
                                     return activeFilter !== 'stores' ? (
-                                        <div className="productCase" key={item.id + 'd'} id={"product-" + item.id} onClick={toDetailProduct}>
+                                        <div className="productCase" key={`productKey` + item.id} id={"product-" + item.id} onClick={toDetailProduct}>
                                             <div className="imageCase" style={{ backgroundImage: `url(${item.image})` }}></div>
                                             <div className="details">
                                                 <div>
@@ -177,12 +190,12 @@ function Product() {
                                                 </div>
                                                 <div className="div">
                                                     <div className="price">
-                                                        <p>{item.weight}</p>
-                                                        <p>{item.price}</p>
+                                                        <p>{String(item.quantity).split("|")[0]}Kg</p>
+                                                        <p>Rp.{item.price}</p>
                                                     </div>
                                                     <div className="rating">
-                                                        <p>#</p>
-                                                        <p>{item.rating} 200 Terjual</p>
+                                                        <FaStar style={{ color: "orange" }} />
+                                                        <p>{item.rating.Rating} 200 Terjual</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -199,5 +212,4 @@ function Product() {
         </>
     );
 }
-
 export default Product;

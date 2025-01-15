@@ -1,37 +1,129 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import '../css/storeDetail.css'
-import { GoArrowLeft } from 'react-icons/go';
+import '../css/storeDetail.css';
 import { FaArrowLeft, FaLocationPin, FaMagnifyingGlass, FaMessage } from 'react-icons/fa6';
 import { FaHeart, FaLemon, FaStar } from 'react-icons/fa';
-import { productsData } from '../jsx/dataModel.jsx';
+import { getStoreData, getUserId } from '../jsx/dataModel.jsx';
+import { addStoreToFav, addVisitoreStore, checkHasChat, isSelfOwnStore, specifiedTakeData } from '../jsx/dataController.jsx';
+import { useAuth } from '../context/auth/authcontext.jsx';
+import Swal from 'sweetalert2';
+import Transition from '../components/transition.jsx';
+import { store } from 'fontawesome';
 
 function StoreDetail() {
+    const { userLoggedIn } = useAuth();
     const location = useLocation();
-    const [saveScroll, setSaveScroll] = useState(false);
+    const navigate = useNavigate();
     const params = new URLSearchParams(location.search);
     const storeId = params.get('storeId');
 
-    const navigate = useNavigate();
+    const [isSelfStore, setIsSelfStore] = useState(false);
+    const [isFav, setIsFav] = useState(false);
+    const [storeData, setStoreProducts] = useState(null);
 
     const toDetailProduct = (event) => {
-
         const productId = event.target.closest('.productCase').id.split('-')[1];
-        navigate(`/ProductDetail?productId=${productId}`);
+        navigate(`/ProductDetail?productId=${productId}`, {
+            state: { fromStore: true }
+        });
+    };
+
+
+    const toggleFavorite = async () => {
+        if (userLoggedIn) {
+            const itSelfProd = await isSelfOwnStore(storeId)
+            if (itSelfProd) {
+                console.log("produkmu");
+                return;
+            } else {
+                try {
+                    const userId = await getUserId();
+                    setIsFav((prev) => !prev);
+                    await addStoreToFav(userId, storeId, !isFav);
+                } catch (error) {
+                    console.error("Error toggling favorite:", error);
+                }
+            }
+        } else {
+            Swal.fire({
+                title: "Peringatan!",
+                text: "Login untuk menambah toko ke favorit",
+                icon: "warning",
+                confirmButtonColor: "#3085d6",
+                confirmButtonText: "Oke",
+                timer: 1000,
+                timerProgressBar: true,
+            });
+        }
     };
 
     const handleBack = () => {
-        navigate(-1);
+        if (location.state?.fromAuth) {
+            navigate('/');
+        } else if (location.state?.fromFavorite) {
+            navigate(-1);
+        } else if (location.state?.fromChatting) {
+            navigate(-1);
+        } else {
+            navigate('/');
+        }
     };
 
 
+    const isSelf = async () => {
+        const UID = await getUserId();
+        if (UID === storeData.StoreData.UserId) {
+            setIsSelfStore(true)
+        } else {
+            setIsSelfStore(false)
+        }
+    }
 
+
+    useEffect(() => {
+        const addNewVisitor = async ()=>{
+            await addVisitoreStore(await getUserId(), storeId)
+        }
+        const fetchData = async () => {
+            try {
+                const data = await getStoreData(storeId);
+                setStoreProducts(data);
+            } catch (error) {
+                console.error("Error fetching store data:", error);
+            }
+        };
+
+        const fetchIsFav = async () => {
+            if (userLoggedIn) {
+                try {
+                    const userId = await getUserId();
+                    const fav = await specifiedTakeData("Accounts", userId, `FavStore/${storeId}`);
+                    console.log(fav)
+                    setIsFav(fav);
+                } catch (error) {
+                    console.error("Error checking favorite status:", error);
+                }
+            }
+        };
+
+
+        fetchData();
+        fetchIsFav();
+        addNewVisitor();
+    }, [storeId, userLoggedIn]);
+
+    if (!storeData) {
+        return "";
+    } else {
+        isSelf();
+    }
 
     return (
         <>
+            <Transition />
             <div className="StoreDetailLogoCase">
-                <FaArrowLeft style={{fontSize:"1.2rem", cursor: 'pointer' }} onClick={handleBack} />
-                <b>Pak Joko Kendil</b>
+                <FaArrowLeft style={{ fontSize: "1.2rem", cursor: 'pointer' }} onClick={handleBack} />
+                <b>{storeData.StoreData.StoreName}</b>
             </div>
             <div className="StoreDetailsPage">
                 <div className="mainStorCase">
@@ -44,10 +136,55 @@ function StoreDetail() {
                         </div>
                         <div className='storeDetailHeadCase'>
                             <div className="storeDetailHeadline">
-                                <b>Pak Joko Kendil</b>
-                                <p><FaLocationPin /> Lampung Timur</p>
+                                <b>{storeData.StoreData.StoreName} {isSelfStore ? "(Anda)" : ""}</b>
+                                <p><FaLocationPin /> {storeData.StoreData.StoreAddress}</p>
                             </div>
-                            <div className="storeChatBox">
+                            <div className="storeChatBox" onClick={async () => {
+                                if (userLoggedIn) {
+                                    const chtid = await checkHasChat(storeData.StoreData.UserId)
+                                    if (chtid.status === true) {
+                                        if(isSelfStore === false){
+                                            navigate(`/ChattingPage?${chtid.ChatId}`)
+                                        }else{
+                                            Swal.fire({
+                                                title: "Toko Anda!",
+                                                text: "Tak mengirim permintaan pesan",
+                                                icon: "warning",
+                                                confirmButtonColor: "#3085d6",
+                                                confirmButtonText: "oke",
+                                            })
+                                        }
+                                    } else {
+                                        if(isSelfStore === false){
+                                            navigate(`/ChattingPage?${chtid.ChatId}-${storeId}`)
+                                        }else{
+                                            Swal.fire({
+                                                title: "Toko Anda!",
+                                                text: "Tak mengirim permintaan pesan",
+                                                icon: "warning",
+                                                confirmButtonColor: "#3085d6",
+                                                confirmButtonText: "oke",
+                                            })
+                                        }
+                                    }
+                                } else {
+                                    Swal.fire({
+                                        title: "Peringatan!",
+                                        text: "Login untuk mengirim pesan",
+                                        icon: "warning",
+                                        showCancelButton: true,
+                                        confirmButtonColor: "#3085d6",
+                                        confirmButtonText: "Iya",
+                                        cancelButtonColor: "red",
+                                        cancelButtonText: "Nanti",
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            sessionStorage.setItem("lastBeforeLogin", window.location.href);
+                                            window.location.href = "/AuthWebPage";
+                                        }
+                                    });
+                                }
+                            }}>
                                 <b>Pesan</b>
                                 <FaMessage />
                             </div>
@@ -55,17 +192,17 @@ function StoreDetail() {
                         <div className="storeDetailInfo">
                             <div>
                                 <b>Kategori Produk</b>
-                                <p>Buah Dan Sayuran</p>
+                                <p>{storeData?.StoreData?.category}</p>
                             </div>
                             <div className="lineSeparator"></div>
                             <div>
                                 <b>Rating</b>
-                                <p><FaStar /> 4.6</p>
+                                <p><FaStar /> {storeData?.StoreData?.rating?.rating}</p>
                             </div>
                             <div className="lineSeparator"></div>
                             <div>
                                 <b>Produk</b>
-                                <p>20</p>
+                                <p>{storeData?.StoreData?.Products?.Total}</p>
                             </div>
                             <div className="lineSeparator"></div>
                             <div>
@@ -79,19 +216,18 @@ function StoreDetail() {
                                 <input type="text" placeholder='Cari Produk Toko' />
                                 <FaLemon className='sSboxLemon' />
                             </div>
-                            <div className="sFavoriteBox">
+                            <div className="sFavoriteBox" onClick={toggleFavorite}>
                                 <b>Favorite</b>
-                                <FaHeart />
+                                <FaHeart style={{ color: isFav ? "red" : "" }} />
                             </div>
                         </div>
-
                     </div>
                 </div>
                 <div className="Products">
-                    <div className="title" style={{fontWeight:"400", fontSize:"0.9rem"}}>Produk Toko Ini</div>
+                    <div className="title" style={{ fontWeight: "400", fontSize: "0.9rem" }}>Produk Toko Ini</div>
                     <div className="contents">
-                        {productsData.map((product, index) => (
-                            <div className="productCase" key={product.id + 'cs'} id={"prod-" + product.id} onClick={toDetailProduct}>
+                        {Object.entries(storeData.StoreProducts).map(([key, product]) => (
+                            <div className="productCase" key={key + 'cs'} id={"prod-" + product.id} onClick={toDetailProduct}>
                                 <div className="imageCase" style={{ backgroundImage: `url(${product.image})` }}></div>
                                 <div className="details">
                                     <div>
@@ -101,12 +237,12 @@ function StoreDetail() {
                                     </div>
                                     <div className="priceRating">
                                         <div className="price">
-                                            <p>{product.weight}</p>
-                                            <p>{product.price}</p>
+                                            <p>{String(product.quantity).split("|")[0]}Kg</p>
+                                            <p>Rp.{product.price}</p>
                                         </div>
                                         <div className="rating">
-                                            <p>#</p>
-                                            <p>{product.rating}</p>
+                                            <FaStar style={{ color: "orange" }} />
+                                            <p>{product.rating.Rating}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -116,7 +252,7 @@ function StoreDetail() {
                 </div>
             </div>
         </>
-    )
+    );
 }
 
-export default StoreDetail
+export default StoreDetail;
