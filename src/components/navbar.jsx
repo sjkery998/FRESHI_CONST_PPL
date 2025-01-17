@@ -1,9 +1,10 @@
 // src/components/Navbar.jsx
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom'; // Gunakan useLocation
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome, faHistory, faShoppingBag, faUser, faHeart } from '@fortawesome/free-solid-svg-icons';
 import styled from 'styled-components';
+import { useFirebase } from '../context/firebaseContext/firebaseContext';
 
 // Styled Components
 const NavbarContainer = styled.nav`
@@ -21,6 +22,7 @@ const NavbarContainer = styled.nav`
 `;
 
 const NavbarLink = styled(NavLink)`
+    position: relative;
     text-decoration: none;
     color: gray;
     font-size: 2rem;
@@ -36,23 +38,24 @@ const NavbarLink = styled(NavLink)`
 
 // Main Component
 function Navbar() {
-    
+    const { Notifications, isThereNewNotif} = useFirebase();
     return (
         <NavbarContainer>
             <NavbarLink to="/" end>
-                <FontAwesomeIcon icon={faHome} fontSize={26}/>
+                <FontAwesomeIcon icon={faHome} fontSize={26} />
             </NavbarLink>
             <NavbarLink to="/product">
-                <FontAwesomeIcon icon={faShoppingBag} fontSize={26}/>
+                <FontAwesomeIcon icon={faShoppingBag} fontSize={26} />
             </NavbarLink>
             <NavbarLink to="/favorite">
-                <FontAwesomeIcon icon={faHeart} fontSize={26}/>
+                <FontAwesomeIcon icon={faHeart} fontSize={26} />
             </NavbarLink>
             <NavbarLink to="/history">
-                <FontAwesomeIcon icon={faHistory} fontSize={26}/>
+                <FontAwesomeIcon icon={faHistory} fontSize={26} />
             </NavbarLink>
             <NavbarLink to="/profile">
-                <FontAwesomeIcon icon={faUser} fontSize={26}/>
+            {isThereNewNotif && (<div style={{width:"10px", height:"10px", position:"absolute", backgroundColor:"red", borderRadius:"5px", top:"5px", right:"-5px"}}></div>)}
+                <FontAwesomeIcon icon={faUser} fontSize={26} />
             </NavbarLink>
         </NavbarContainer>
     );

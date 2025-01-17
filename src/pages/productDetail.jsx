@@ -25,18 +25,19 @@ function ProductDetail() {
     const [selectedOption, setSelectedOption] = useState(null);
     const [selectedCheckbox, setselectedCheckbox] = useState("Kirim Ke Alamat")
     const [isCooldown, setIsCooldown] = useState(false)
+    const [isCustomAddress, setIsCustomAddress] = useState(null);
     const [deliveryCost, setDeliveryCost] = useState({
         "Ambil Di Toko": 0,
         "COD": 0,
         "Kirim Ke Alamat": 5000
     })
-    const [totalPrice, setTotalPrice] = useState(parseInt((selectedProduct?.price  * quantity + 10000 + deliveryCost[selectedCheckbox])  || 0));
+    const [totalPrice, setTotalPrice] = useState(parseInt((selectedProduct?.price * quantity + 10000 + deliveryCost[selectedCheckbox]) || 0));
     const checkoutData = useMemo(() => {
         return {
             "Id_User": userData ? userData.UserId : "",
             "Nama": userData ? userData.Username : "",
             "Email": userData ? userData.Email : "",
-            "Alamat": userData ? userData.Address : "",
+            "Alamat": userData ? isCustomAddress || userData.Address : "",
             "Id_Produk": productId ? productId : "",
             "Nama_Produk": selectedProduct ? selectedProduct.name : "",
             "Kuantitas": selectedProduct ? selectedProduct.quantity : "",
@@ -135,10 +136,10 @@ function ProductDetail() {
         if (userLoggedIn) {
             console.log(selectedProduct.storeId)
             const itSelfProd = await isSelfOwnStore(selectedProduct.storeId)
-            if(itSelfProd){
+            if (itSelfProd) {
                 console.log("produkmu");
                 return;
-            }else{
+            } else {
                 try {
                     setIsFavorite((prev) => !prev);
                     await addProdToFav(`${await getUserId()}`, productId, !isFavorite);
@@ -204,7 +205,7 @@ function ProductDetail() {
     const handleBuyClick = async () => {
         if (userLoggedIn) {
             const itSelfProd = await isSelfOwnStore(selectedProduct.storeId)
-            if(itSelfProd){
+            if (itSelfProd) {
                 Swal.fire({
                     title: "Toko Anda!",
                     text: "Tak dapat membeli toko sendiri",
@@ -212,7 +213,7 @@ function ProductDetail() {
                     confirmButtonColor: "#3085d6",
                     confirmButtonText: "oke",
                 })
-            }else{
+            } else {
                 setIsNavExpanded(!isNavExpanded);
             }
         } else {
@@ -233,8 +234,8 @@ function ProductDetail() {
             });
         }
     };
-    function changeTotalPrice(){
-        setTotalPrice(parseInt((selectedProduct?.price  * quantity + 10000 + deliveryCost[selectedCheckbox])  || 0))
+    function changeTotalPrice() {
+        setTotalPrice(parseInt((selectedProduct?.price * quantity + 10000 + deliveryCost[selectedCheckbox]) || 0))
     }
     const handleIncrease = () => {
         setQuantity((prev) => {
@@ -248,7 +249,7 @@ function ProductDetail() {
             return newQuantity;
         });
     };
-    
+
     const handleDecrease = () => {
         setQuantity((prev) => {
             const newQuantity = prev > 1 ? prev - 1 : 1;
@@ -261,7 +262,7 @@ function ProductDetail() {
             return newQuantity;
         });
     };
-    
+
     const toggleDetails = () => setIsExpanded(!isExpanded);
 
     const handleBack = () => {
@@ -283,6 +284,7 @@ function ProductDetail() {
     const handleChange = (newValue) => setSelectedOption(newValue);
 
 
+    
     useEffect(() => {
         fetchProductData();
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -489,11 +491,26 @@ function ProductDetail() {
                                 <div>
                                     <p className='coYourLocation'>Lokasi Anda</p>
                                 </div>
-                                <b className='coChangeAddress'>Ubah Lokasi</b>
+                                <b className='coChangeAddress'
+                                    onClick={() => {
+                                        Swal.fire({
+                                            title: "Alamat",
+                                            input: "text",
+                                            inputLabel: "Sesuaikan Alamat",
+                                            inputPlaceholder: "Masukan Alamat",
+                                            showCancelButton: true,
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                setIsCustomAddress(result.value);
+
+                                            }
+                                        });
+                                    }}
+                                >Custom Alamat</b>
                             </div>
                             <p className="coAccdressDetails">
                                 <FaLocationPin />
-                                {userData ? userData.Address : "pilih lokasi"}
+                                {userData ? isCustomAddress || userData.Address : "pilih lokasi"}
                             </p>
                         </div>
                         <div className="separator"></div><br />
@@ -522,7 +539,7 @@ function ProductDetail() {
                         </div>
                         <br />
                         <div className="separator"></div>
-                        
+
                         <div className="coSummaryCase" style={{ marginBottom: isNavExpanded ? '130px' : '', }}>
                             <div className='coSummaryProd'>
                                 <b>Harga Produk</b>
@@ -573,10 +590,10 @@ function ProductDetail() {
                             <b>{`Rp.${totalPrice}`}</b>
                         </div>
                         <div className="checkOutButton" style={{ marginLeft: "auto", marginRight: "5px" }}
-                            onClick={async ()=>{
+                            onClick={async () => {
                                 if (userLoggedIn) {
                                     const itSelfProd = await isSelfOwnStore(selectedProduct.storeId)
-                                    if(itSelfProd){
+                                    if (itSelfProd) {
                                         Swal.fire({
                                             title: "Toko Anda!",
                                             text: "Tak dapat mengirim pesan",
@@ -584,7 +601,7 @@ function ProductDetail() {
                                             confirmButtonColor: "#3085d6",
                                             confirmButtonText: "oke",
                                         })
-                                    }else{
+                                    } else {
                                         navigate(`/ChattingPage?discussProd-${productId}-${selectedProduct.storeId}-${selectedProduct.name}-${generateRandomAlphanumeric()}`)
                                     }
                                 } else {

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { FaArrowLeft, FaArrowRight, FaArrowUp, FaCheck, FaFileInvoice, FaFolder, FaLocationPin, FaMagnifyingGlass, FaPen, FaPlus, FaReceipt, FaStore, FaTrash } from 'react-icons/fa6';
+import { FaArrowLeft, FaArrowRight, FaArrowUp, FaCheck, FaCross, FaFileInvoice, FaFolder, FaLocationPin, FaMagnifyingGlass, FaPen, FaPlus, FaReceipt, FaStore, FaTrash, FaX } from 'react-icons/fa6';
 import { FaLemon, FaStar } from 'react-icons/fa';
 import Transition from '../components/transition.jsx';
 import { useAuth } from '../context/auth/authcontext.jsx';
@@ -8,7 +8,7 @@ import '../css/storeDetail.css';
 import '../css/storeManagement.css';
 import { TbReload } from 'react-icons/tb';
 import { MdSpaceDashboard } from 'react-icons/md';
-import { handleAddProduct, storeDataChange, storeManagementDataFetch, StoreProductsData } from '../jsx/storeManagement/storeManagement.jsx';
+import { handleAddProduct, handleDeleteProduct, storeDataChange, storeManagementDataFetch, StoreProductsData } from '../jsx/storeManagement/storeManagement.jsx';
 import Swal from 'sweetalert2';
 
 function StoreManagement() {
@@ -20,7 +20,19 @@ function StoreManagement() {
     const [prodDataM, setProdDataM] = useState(null);
     const [selectedNavItem, setSelectedNavItem] = useState("Dashboard");
     const [isFormChanged, setIsFormChanged] = useState(false);
+    const [toPreview, setToPreview] = useState({
+        isPreview: false,
+        index: 0
+    });
     const submitFormStore = useRef(null);
+    const nameStoreRef = useRef(null)
+    const navItemRef = useRef({
+        Dashboard: useRef(null),
+        Transaction: useRef(null),
+        Products: useRef(null),
+        StoreData: useRef(null),
+        Invoice: useRef(null)
+    });
     const [formStoreData, setformStoreData] = useState({
         "StoreName": "",
         "Category": "",
@@ -49,19 +61,11 @@ function StoreManagement() {
     }, []);
 
     const handleBack = () => {
-        if (location.state?.fromAuth) {
-            navigate('/');
-        } else if (location.state?.fromFavorite) {
-            navigate(-1);
-        } else if (location.state?.fromChatting) {
-            navigate(-1);
-        } else {
-            navigate('/');
-        }
+        navigate('/Profile')
     };
 
-    function addNewProduct() {
-        handleAddProduct(storeDataM.storeData.storeName);
+    function addNewProduct(isEdit, idProd, refreshItem) {
+        handleAddProduct(storeDataM.storeData.storeName, isEdit, idProd, refreshItem);
     }
 
     function navItemClicked(navItem) {
@@ -82,7 +86,7 @@ function StoreManagement() {
                 "Address": storeDataM?.storeData?.storeAddr || "",
                 "BannerImg": storeDataM?.storeData?.storeThumbnail || null,
             })
-            
+
             console.log(formStoreData)
         }
         console.log(navItem.target.closest(".manageOptions").id)
@@ -182,23 +186,23 @@ function StoreManagement() {
                             </div>
                         </div>
                         <div className='storeManageOptions'>
-                            <div className="storeDetailHeadline manageOptions" id='Dashboard' onClick={(e) => { navItemClicked(e) }}>
+                            <div className="storeDetailHeadline manageOptions" id='Dashboard' ref={navItemRef.current.Dashboard} onClick={(e) => { navItemClicked(e) }}>
                                 <MdSpaceDashboard />
                                 <p>Dashboard</p>
                             </div>
-                            <div className="storeDetailHeadline manageOptions" id='Transactions' onClick={(e) => { navItemClicked(e) }}>
+                            <div className="storeDetailHeadline manageOptions" id='Transactions' ref={navItemRef.current.Transaction} onClick={(e) => { navItemClicked(e) }}>
                                 <FaReceipt />
                                 <p>Transaksi</p>
                             </div>
-                            <div className="storeDetailHeadline manageOptions" id='Products' onClick={(e) => { navItemClicked(e) }}>
+                            <div className="storeDetailHeadline manageOptions" id='Products' ref={navItemRef.current.Products} onClick={(e) => { navItemClicked(e) }}>
                                 <FaFolder />
                                 <p>Produk</p>
                             </div>
-                            <div className="storeDetailHeadline manageOptions" id='StoreData' onClick={(e) => { navItemClicked(e) }}>
+                            <div className="storeDetailHeadline manageOptions" id='StoreData' ref={navItemRef.current.StoreData} onClick={(e) => { navItemClicked(e) }}>
                                 <FaStore />
                                 <p>Data Toko</p>
                             </div>
-                            <div className="storeDetailHeadline manageOptions" id='Invoice' onClick={(e) => { navItemClicked(e) }}>
+                            <div className="storeDetailHeadline manageOptions" id='Invoice' ref={navItemRef.current.Invoice} onClick={(e) => { navItemClicked(e) }}>
                                 <FaFileInvoice />
                                 <p>Invoice</p>
                             </div>
@@ -283,13 +287,13 @@ function StoreManagement() {
                             {selectedNavItem === "Transactions" ? trPage === "PesananMasuk" ? currentItems?.length > 0 ? currentItems?.map((transaction, index) => (
                                 <div className="trCards" key={index}>
                                     <div className="trCardMain">
-                                        <b>#{transaction.traId}</b>
-                                        <p>Pembayaran : {transaction.traStatus === "diproses" ? "Berhasil" : "Belum Dibayar"}</p>
-                                        <p>Status : {transaction.traStatus || "Tidak diketahui"}</p>
+                                        <b>#{transaction?.traId}</b>
+                                        <p>Pembayaran : {transaction?.traStatus === "diproses" ? "Berhasil" : transaction?.traStatus === "dibatalkan" ? "Dibatalkan" : "Belum Dibayar"}</p>
+                                        <p>Status : {transaction?.traStatus || "Tidak diketahui"}</p>
                                     </div>
                                     <div className="trCardEnd">
                                         <b>Detail</b>
-                                        <p>{transaction.traSettledTime || "Belum selesai"}</p>
+                                        <p>{transaction?.traSettledTime || "Belum selesai"}</p>
                                     </div>
                                 </div>
                             )) : <center>Tidak Ada Data</center> : <center>Tidak Ada Data</center> : null
@@ -358,26 +362,37 @@ function StoreManagement() {
                                 <b>Produk</b>
                             </div>
                             <div className="prodMHeadActions">
-                                <FaPlus className="MHeadActions" onClick={addNewProduct}></FaPlus>
-                                <FaCheck className="MHeadActions" onClick={() => { }}></FaCheck>
+                                <FaPlus className="MHeadActions" onClick={() => { addNewProduct(false) }}></FaPlus>
+                                <FaCheck className="MHeadActions" onClick={() => { console.log(currentItems) }}></FaCheck>
                             </div>
                         </div>
                         <div className="prodMContainer">
                             {selectedNavItem === "Products" && currentItems?.length > 0 ? (
                                 currentItems
                                     .filter(product => product && product.id && product.name)
-                                    .map((product) => (
-                                        <div key={product.id + "s"} className="prodCards">
+                                    .map((product, index) => (
+                                        <div key={index + "-prod-" + product.id} className="prodCards">
                                             <div className="prodCardMain">
                                                 <b>{product.name}</b>
                                                 <p>Kode : {product.id}</p>
                                                 <p>Perlihat : {product.status ? 'Aktif' : 'Nonaktif'}</p>
                                             </div>
                                             <div className="prodCardEnd">
-                                                <FaArrowRight />
+                                                <b onClick={
+                                                    () => {
+                                                        setToPreview({
+                                                            isPreview: true,
+                                                            index: index
+                                                        })
+                                                    }
+                                                }>Lihat</b>
                                                 <div className="prodCardActions">
-                                                    <FaPen className="pCardActions" style={{ color: "white" }} />
-                                                    <FaTrash className="pCardActions" style={{ color: "red" }} />
+                                                    <FaPen className="pCardActions" style={{ color: "white" }} onClick={() => { addNewProduct(true, product.id, navItemRef.current.Products) }} />
+                                                    <FaTrash className="pCardActions" style={{ color: "red" }}
+                                                        onClick={async () => {
+                                                            await handleDeleteProduct(storeDataM?.storeData?.storeId, product.id, navItemRef.current.Products)
+                                                        }}
+                                                    />
                                                 </div>
                                             </div>
                                         </div>
@@ -450,13 +465,15 @@ function StoreManagement() {
                         <div className="storeMHead">
                             <b className="storeMHTitle">Data Toko</b>
                             <div className="storeMHActions">
-                                
-                                {(isFormChanged) ? <><b>Batal</b>
-                                    <b onClick={()=>{submitFormStore.current.click()}}>Simpan</b></> : <b>Edit</b>}
+
+                                {(isFormChanged) ? <>
+                                    <b onClick={() => { nameStoreRef.current.blur(); setIsFormChanged(false) }}>Batal</b>
+                                    <b onClick={() => { submitFormStore.current.click() }}>Simpan</b></> :
+                                    <b onClick={() => { nameStoreRef.current.focus(); setIsFormChanged(true) }}>Edit</b>}
                             </div>
                         </div>
                         <form className="storeMContainer"
-                            onSubmit={async (e)=>{
+                            onSubmit={async (e) => {
                                 e.preventDefault();
                                 Swal.fire({
                                     icon: "warning",
@@ -475,9 +492,10 @@ function StoreManagement() {
                             <div className="storeMCFields">
                                 <label>Nama Toko</label>
                                 <input
+                                    ref={nameStoreRef}
                                     type="text"
                                     value={formStoreData.StoreName}
-                                    onChange={(e) => {setformStoreData({ ...formStoreData, StoreName: e.target.value }); setIsFormChanged(true)}}
+                                    onChange={(e) => { setformStoreData({ ...formStoreData, StoreName: e.target.value }); setIsFormChanged(true) }}
                                 />
                             </div>
                             <div className="storeMCFields">
@@ -485,7 +503,7 @@ function StoreManagement() {
                                 <input
                                     type="text"
                                     value={formStoreData.Category}
-                                    onChange={(e) =>{ setformStoreData({ ...formStoreData, Category: e.target.value }); setIsFormChanged(true)}}
+                                    onChange={(e) => { setformStoreData({ ...formStoreData, Category: e.target.value }); setIsFormChanged(true) }}
                                 />
                             </div>
                             <div className="storeMCFields">
@@ -493,7 +511,7 @@ function StoreManagement() {
                                 <input
                                     type="text"
                                     value={formStoreData.Desc}
-                                    onChange={(e) => {setformStoreData({ ...formStoreData, Desc: e.target.value }); setIsFormChanged(true)}}
+                                    onChange={(e) => { setformStoreData({ ...formStoreData, Desc: e.target.value }); setIsFormChanged(true) }}
                                 />
                             </div>
                             <div className="storeMCFields">
@@ -501,7 +519,7 @@ function StoreManagement() {
                                 <input
                                     type="text"
                                     value={formStoreData.Address}
-                                    onChange={(e) => {setformStoreData({ ...formStoreData, Address: e.target.value }); setIsFormChanged(true)}}
+                                    onChange={(e) => { setformStoreData({ ...formStoreData, Address: e.target.value }); setIsFormChanged(true) }}
                                 />
                             </div>
                             <div className="storeMCFields">
@@ -509,16 +527,124 @@ function StoreManagement() {
                                 <input
                                     type="file"
                                     value=""
-                                    onChange={(e) => {setformStoreData({ ...formStoreData, BannerImg: e.target.files[0] }); setIsFormChanged(true)}}
+                                    onChange={(e) => { setformStoreData({ ...formStoreData, BannerImg: e.target.files[0] }); setIsFormChanged(true) }}
                                 />
                             </div>
-                            <input type="submit" style={{visibility: "hidden"}} ref={submitFormStore}/>
+                            <input type="submit" style={{ visibility: "hidden" }} ref={submitFormStore} />
                             <br />
                         </form>
 
                     </div>
                 </div>
             </div>
+            {toPreview.isPreview &&
+                <div className="showCaseProd"
+                    style={{
+                        position: "absolute",
+                        zIndex: "10",
+                        top: "0",
+                        backdropFilter: "blur(10px)",
+                        backgroundColor: "rgba(0, 0, 0, 0.61)",
+                        width: document.body.clientWidth,
+                        height: document.body.clientHeight,
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "center",
+                        alignItems: "center"
+                    }}>
+                    <b style={{
+                        color: "white"
+                    }}
+                        onClick={() => {
+                            setToPreview({
+                                isPreview: false,
+                                index: 0
+                            })
+                        }}
+                    >Tutup</b>
+                    <div
+                        className="productCase"
+                        key={`productKey` + prodDataM[toPreview.index].id}
+                        id={"product-" + prodDataM[toPreview.index].id}
+                        style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            border: "1px solid #ddd",
+                            borderRadius: "8px",
+                            overflow: "hidden",
+                            boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
+                            width: "300px",
+                            margin: "16px",
+                        }}
+                    >
+                        <div
+                            className="imageCase"
+                            style={{
+                                backgroundImage: `url(http://localhost:5173${prodDataM[toPreview.index].image})`,
+                                backgroundSize: "cover",
+                                backgroundPosition: "center",
+                                height: "250px",
+                                width: "100%",
+                            }}
+                        ></div>
+                        <div
+                            className="details"
+                            style={{
+                                padding: "16px",
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: "8px",
+                                backgroundColor: "white"
+                            }}
+                        >
+                            <div>
+                                <b style={{ fontSize: "18px", color: "#333" }}>
+                                    {prodDataM[toPreview.index].name}
+                                </b>
+                                <p style={{ fontSize: "14px", color: "#555" }}>
+                                    {prodDataM[toPreview.index].storeName}
+                                </p>
+                                <p style={{ fontSize: "14px", color: "#777" }}>
+                                    {prodDataM[toPreview.index].desc}
+                                </p>
+                            </div>
+                            <div className="div" style={{ marginTop: "16px" }}>
+                                <div
+                                    className="price"
+                                    style={{
+                                        display: "flex",
+                                        justifyContent: "space-between",
+                                        alignItems: "center",
+                                        marginBottom: "8px",
+                                    }}
+                                >
+                                    <p style={{ fontSize: "16px", fontWeight: "bold", color: "#333" }}>
+                                        {String(prodDataM[toPreview.index].quantity).split("|")[0]}Kg
+                                    </p>
+                                    <p style={{ fontSize: "16px", fontWeight: "bold", color: "#d32f2f" }}>
+                                        Rp.{prodDataM[toPreview.index].price}
+                                    </p>
+                                </div>
+                                <div
+                                    className="rating"
+                                    style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: "8px",
+                                        color: "#ffa000",
+                                    }}
+                                >
+                                    <FaStar />
+                                    <p style={{ fontSize: "14px", color: "#555" }}>
+                                        {prodDataM[toPreview.index].rating.Rating} 200 Terjual
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            }
         </>
     );
 }

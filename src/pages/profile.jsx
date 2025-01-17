@@ -13,6 +13,7 @@ import Swal from "sweetalert2";
 import { userData } from "../jsx/dataModel.jsx";
 import { useAuth } from "../context/auth/authcontext.jsx";
 import { registerToSeller } from "../jsx/dataController.jsx";
+import { useFirebase } from "../context/firebaseContext/firebaseContext.jsx";
 
 
 
@@ -20,7 +21,7 @@ function Profile() {
     const { userLoggedIn } = useAuth();
     const [UserData, setUserData] = useState(userData)
     const navigate = useNavigate();
-
+    const { isThereNewNotif } = useFirebase();
 
     const toChatPage = () => {
         navigate("/ChatPage")
@@ -83,7 +84,7 @@ function Profile() {
         <>
             <Transition />
             <div className="simpleHeaderPage" style={{ justifyContent: "space-between", border: "none" }}>
-                <FaRegBell style={{ fontSize: "1.3rem" }} onClick={toNotif} />
+                <div style={{position:"relative"}}><FaRegBell style={{ fontSize: "1.3rem" }} onClick={toNotif} />{isThereNewNotif && (<div style={{width:"10px", height:"10px", position:"absolute", backgroundColor:"red", borderRadius:"5px", top:"-8px", right:"-5px"}}></div>)}</div>
                 Profile
                 <FaRegMessage style={{ fontSize: "1.2rem" }} onClick={toChatPage} />
             </div>

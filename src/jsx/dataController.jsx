@@ -180,23 +180,28 @@ async function registerToSeller(UserId) {
     })
 }
 
-async function toAddNewProduct(newProdData) {
-    const newId = generateRandomAlphanumeric()
+async function toAddNewProduct(newProdData, isEdit, prodId) {
+    const newId = isEdit ? prodId : generateRandomAlphanumeric()
     // console.log(prodAddData);
     const formData = new FormData();
     formData.append('image', newProdData.image);
     try {
-        const response = await fetch(`https://926b-114-10-100-65.ngrok-free.app/api/productImage/${newId}`, {
-            method: 'POST',
-            body: formData,
-        });
-        const data = await response.json();
-        if (response.ok) {
+        let dataImg = {
+            fileUrl : '/public/images/apple-green.jpg'
+        }
+        if(!isEdit){
+            const response = await fetch(`${import.meta.env.VITE_MIDTRANS_MAIN_GATEWAY}api/productImage/${newId}`, {
+                method: 'POST',
+                body: formData,
+            });
+            dataImg.fileUrl = await response.json();
+        }
+        if (dataImg) {
             const prodAddData = {
                 "desc": newProdData.desc,
                 "detail": newProdData.detail,
                 "id": newId,
-                "image": data.fileUrl,
+                "image": dataImg.fileUrl,
                 "name": newProdData.name,
                 "price": newProdData.price || 0,
                 "quantity": `${newProdData.quantity}|Kg`,
@@ -226,7 +231,7 @@ async function toAddNewProduct(newProdData) {
                         }
                         return items;
                     });
-                    if(itemsRef){
+                    if (itemsRef) {
                         const Total = await getDataFromNode(`Stores/${prodAddData.storeId}/Products/Items`);
                         console.log(Total)
                         console.log(Total.length)
@@ -290,13 +295,14 @@ async function addTransaction(data) {
                 return currentData;
             }
         });
+        await set(ref(db, `Stores/${transactionData.Id_Toko}/Transactions/${transactionData.Id_Transaksi}`), transactionData)
     });
     console.log("Transaksi berhasil disimpan!");
     return transactionData;
 
 }
 
-async function payNow(tranData, apiSecretKey) {
+async function payNow(tranData, navigate) {
     // const idOrder = generateRandomAlphanumeric();
     const midData = {
         id: tranData.Id_Produk,
@@ -309,25 +315,29 @@ async function payNow(tranData, apiSecretKey) {
         transactionId: tranData.Id_Transaksi
     };
     try {
-        return fetch('api/tokenizer', {
+        return fetch(import.meta.env.VITE_MIDTRANS_TOKENIZER, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiSecretKey}`,
+                'Authorization': `Bearer ${import.meta.env.VITE_API_KEY_SECRET}`,
             },
             body: JSON.stringify(midData),
         }).then(response => response.json()).then(async data => {
 
             if (data) {
-
                 const tokens = data;
                 await universalDataFunction("update", `Stores/${tranData.Id_Toko}`, `Transactions.${tranData.Id_Transaksi}`, tranData);
-
-
-                return tokens;
-
-
-
+                if (tokens) {
+                    try {
+                        await universalDataFunction("update", `Transactions`, `${tranData.Id_Transaksi}.token`, tokens);
+                        navigate(`/processPayment?transactionId=${tranData.Id_Transaksi}&token=${tokens}`);
+                    } catch (error) {
+                        console.error("Error updating transaction or navigating:", error);
+                        alert("Terjadi kesalahan, silakan coba lagi.");
+                    }
+                } else {
+                    console.log("gagal")
+                }
             } else {
                 console.error('Token is missing:', data);
                 alert('Failed to generate transaction token.');
@@ -343,16 +353,6 @@ async function payNow(tranData, apiSecretKey) {
 }
 
 const getDataFromNode = async (pathh) => (await get(ref(db, pathh))).val();
-
-async function setNewTrStatus(data, id, result) {
-    console.log(id)
-    console.log(result.order_id)
-    console.log(id === result.order_id)
-    // await universalDataFunction("update", `Transactions/${result.order_id}`, `recipt`, result)
-    // await universalDataFunction("update", `Transactions`, `${id}`, null)
-    // await universalDataFunction("update", `Accounts/${await getUserId()}`, `Transactions.${id}`, null)
-    // await universalDataFunction("update", `Accounts/${await getUserId()}`, `Transactions.${result.order_id}`, "pending")
-}
 
 async function setTransToSuccess(idTransaksi, userId, recipt) {
 
@@ -389,36 +389,6 @@ async function setTransToSuccess(idTransaksi, userId, recipt) {
     } catch (error) {
         console.error("Error in setTransToSuccess:", error);
         throw error;
-    }
-}
-
-async function autoSuccessTranChecker(transactionId) {
-    const status = await specifiedTakeData("Transactions", `${transactionId}/recipt`, "transaction_status");
-    const order_Id = await specifiedTakeData("Transactions", `${transactionId}/recipt`, "order_id");
-    if (status !== "settlement") {
-        console.log("belum di bayar");
-        if (order_Id) {
-            console.log(order_Id);
-            try {
-                const response = await fetch(`/checkPayment/midtrans/${order_Id}`);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                const data = await response.json();
-                if (data.transaction_status === "settlement") {
-                    console.log('Data from backend:', data.transaction_status);
-                    await setTransToSuccess(transactionId, await getUserId(), data);
-                    return true;
-                }
-            } catch (error) {
-                console.error("Error in addTransaction:", error);
-            }
-
-
-        }
-
-    } else {
-        console.log("sudah di bayar");
     }
 }
 
@@ -727,11 +697,74 @@ async function isSelfOwnStore(storeId) {
             timer: 1000,
             timerProgressBar: true,
         });
+
         return true;
     } else {
         return false
     }
 }
 
+const editProfileData = async (newProfileData) => {
+    if (newProfileData !== null) {
+        Swal.fire({
+            title: "Peringatan!",
+            text: "Anda Yakin Ingin Mengubah Data?",
+            icon: "warning",
+            confirmButtonColor: "#3085d6",
+            confirmButtonText: "Oke",
+            showCancelButton: true,
+            cancelButtonText: "Batal",
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                await universalDataFunction("update", `Accounts/${await getUserId()}`,
+                    [
+                        'Username',
+                        'Address',
+                        'PhoneNumber'
+                    ],
+                    [
+                        newProfileData.Username,
+                        newProfileData.Address,
+                        newProfileData.PhoneNum,
+                    ]
+                )
+            }
+        });
+    }
+}
 
-export { getDataFromNode, universalDataFunction, universalTakeData, specifiedTakeData, generateCurrentTime, generateRandomAlphanumeric, addProdToFav, addStoreToFav, addTransaction, payNow, setTransToSuccess, autoSuccessTranChecker, chatMessageListener, sendMessage, chatIdValidator, isUserHasStore, setNewTrStatus, checkHasChat, isSelfOwnStore, userChatsListener, addVisitoreStore, setAccountData, registerToSeller, toAddNewProduct }
+
+const deleteStoreProduct = async (storeId, prodId, refreshItem) => {
+    try {
+        const snapshot = await get(ref(db, `Stores/${storeId}/Products/Items`));
+        if (snapshot.exists()) {
+            await set(ref(db, `Stores/${storeId}/Products/Items`), snapshot.val().filter((product) => product !== prodId));
+            await set(ref(db, `Products/${prodId}`), null)
+            console.log("Item berhasil dihapus!");
+            refreshItem.current.click();
+        } else {
+            console.log("Data tidak ditemukan!");
+        }
+    } catch (error) {
+        console.error("Terjadi kesalahan:", error);
+    }
+}
+
+
+const toCancelPayment = async (idToko, idTran) => {
+    if (idToko !== undefined && idTran !== undefined) {
+        console.log(idToko, idTran);
+        await universalDataFunction("update", `Stores/${idToko}`, `Transactions.${idTran}.status`, "dibatalkan")
+        await set(ref(db, `Accounts/${await getUserId()}/Transactions/${idTran}`), null)
+        await set(ref(db, `Transactions/${idTran}`), null)
+        Swal.fire("Transaksi Dibatalkan.", "success");
+    }
+}
+
+const setNotificationToRead = (notifId)=>{
+    if(notifId){
+        universalDataFunction("update", `Accounts/${getUserId()}`, `Notifications.${notifId}.isRead`, true);
+    }
+}
+
+export { getDataFromNode, universalDataFunction, universalTakeData, specifiedTakeData, generateCurrentTime, generateRandomAlphanumeric, addProdToFav, addStoreToFav, addTransaction, payNow, setTransToSuccess, chatMessageListener, sendMessage, chatIdValidator, isUserHasStore, checkHasChat, isSelfOwnStore, userChatsListener, addVisitoreStore, setAccountData, registerToSeller, toAddNewProduct, editProfileData, deleteStoreProduct, toCancelPayment, setNotificationToRead }

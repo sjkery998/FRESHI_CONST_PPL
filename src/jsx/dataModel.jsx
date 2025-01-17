@@ -163,19 +163,6 @@ const userChats = await getUserChats();
 const notificationsData = [
     { id: 1, title: "Pesanan Diproses", message: "Pesanan Anda sedang diproses dan akan segera dikirim.", timestamp: "2025-01-01 09:00", isRead: false, type: "order" },
     { id: 2, title: "Diskon Spesial", message: "Dapatkan diskon 20% untuk produk buah segar hari ini!", timestamp: "2025-01-01 08:30", isRead: false, type: "promo" },
-    { id: 3, title: "Pembayaran Berhasil", message: "Pembayaran Anda telah diterima. Terima kasih telah berbelanja!", timestamp: "2025-01-01 08:00", isRead: true, type: "payment" },
-    { id: 4, title: "Pengiriman Dimulai", message: "Pesanan Anda sedang dalam perjalanan ke lokasi Anda.", timestamp: "2024-12-31 18:45", isRead: false, type: "delivery" },
-    { id: 5, title: "Pesanan Diterima", message: "Pesanan Anda telah diterima. Semoga Anda puas dengan produk kami!", timestamp: "2024-12-31 17:30", isRead: true, type: "order" },
-    { id: 6, title: "Notifikasi Sistem", message: "Sistem akan diperbarui pada 2 Januari pukul 03.00 WIB.", timestamp: "2024-12-30 15:00", isRead: true, type: "system" },
-    { id: 7, title: "Pengingat Promo", message: "Promo akhir tahun akan segera berakhir! Jangan sampai terlewat.", timestamp: "2024-12-30 10:00", isRead: false, type: "promo" },
-    { id: 8, title: "Ulasan Produk", message: "Berikan ulasan Anda untuk pesanan terbaru dan dapatkan poin reward!", timestamp: "2024-12-29 12:30", isRead: true, type: "feedback" },
-    { id: 9, title: "Poin Reward", message: "Anda mendapatkan 50 poin reward atas pembelian terbaru Anda.", timestamp: "2024-12-29 10:00", isRead: false, type: "reward" },
-    { id: 10, title: "Produk Baru", message: "Produk apel Fuji baru saja tersedia di toko kami!", timestamp: "2024-12-28 14:15", isRead: true, type: "product" },
-    { id: 11, title: "Pesanan Gagal", message: "Pesanan Anda gagal diproses karena masalah pembayaran.", timestamp: "2024-12-27 16:00", isRead: true, type: "error" },
-    { id: 12, title: "Voucher Anda", message: "Anda memiliki voucher Rp50.000 yang akan segera kadaluarsa.", timestamp: "2024-12-27 08:45", isRead: false, type: "voucher" },
-    { id: 13, title: "Selamat Tahun Baru!", message: "Semoga tahun baru ini membawa kebahagiaan dan kesuksesan untuk Anda.", timestamp: "2025-01-01 00:00", isRead: true, type: "greeting" },
-    { id: 14, title: "Cek Ongkir", message: "Gratis ongkir untuk pembelian di atas Rp200.000 hari ini saja!", timestamp: "2024-12-26 09:00", isRead: false, type: "promo" },
-    { id: 15, title: "Pesanan Dibatalkan", message: "Pesanan Anda telah dibatalkan sesuai permintaan.", timestamp: "2024-12-25 18:00", isRead: true, type: "order" }
 ];
 
 

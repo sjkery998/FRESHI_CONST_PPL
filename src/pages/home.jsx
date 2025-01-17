@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import MainCarousel from '../components/mainCarousel';
 import '../css/home.css';
 import '../css/webComponents.css';
@@ -51,6 +51,8 @@ function Home() {
     const toProduct = () => {
         navigate("/Product");
     }
+
+    
 
     useEffect(() => {
         const lastScrollPosition = sessionStorage.getItem('lastScrollPosition');

@@ -1,6 +1,6 @@
 import Swal from 'sweetalert2';
 import withReactContent from "sweetalert2-react-content";
-import { generateRandomAlphanumeric, specifiedTakeData, toAddNewProduct, universalDataFunction, universalTakeData } from '../dataController';
+import { deleteStoreProduct, generateRandomAlphanumeric, specifiedTakeData, toAddNewProduct, universalDataFunction, universalTakeData } from '../dataController';
 import { getUserId } from '../webAuth';
 import { get, onValue, ref } from 'firebase/database';
 import { db } from '../firebaseConfig';
@@ -113,9 +113,14 @@ async function storeManagementDataFetch(callback) {
 
 
 
-const handleAddProduct = (storeName) => {
+const handleAddProduct = async (storeName, isEdit, idProd, refreshItem) => {
+    let toEditData
+    if(isEdit){
+        console.log(isEdit)
+        toEditData = await universalTakeData(`Products.${idProd}`)
+    }
     withReactContent(Swal).fire({
-        title: '<span class="swal-title">Tambah Produk Baru</span>',
+        title: isEdit ? "Edit Data Produk" : '<span class="swal-title">Tambah Produk Baru</span>',
         html: (
             <div className="swal-container" style={{ display: "flex", flexDirection: "column", alignItems: "start" }}>
                 <label htmlFor="productName">Nama Produk</label>
@@ -123,6 +128,7 @@ const handleAddProduct = (storeName) => {
                     id="productName"
                     className="swal2-input styled-input"
                     placeholder="Masukkan nama produk"
+                    defaultValue={toEditData?.name || ""}
                     style={{ margin: "0", width: "100%", marginBottom: "0.5rem" }}
                 />
                 <label htmlFor="productDesc">Deskripsi</label>
@@ -130,6 +136,7 @@ const handleAddProduct = (storeName) => {
                     id="productDesc"
                     className="swal2-input styled-input"
                     placeholder="Masukkan tagline"
+                    defaultValue={toEditData?.desc || ""}
                     style={{ margin: "0", width: "100%", marginBottom: "0.5rem" }}
                 />
 
@@ -137,7 +144,8 @@ const handleAddProduct = (storeName) => {
                 <textarea
                     id="productDetail"
                     className="swal2-textarea styled-input"
-                    placeholder="Masukkan deskripsi produk"
+                    placeholder="Masukkan Detail produk"
+                    defaultValue={toEditData?.detail || ""}
                     style={{ margin: "0", width: "100%", marginBottom: "0.5rem" }}
                 ></textarea>
 
@@ -148,6 +156,7 @@ const handleAddProduct = (storeName) => {
                     type="number"
                     className="swal2-input styled-input"
                     placeholder="Masukkan harga"
+                    defaultValue={toEditData?.price || ""}
                     style={{ margin: "0", width: "100%", marginBottom: "0.5rem" }}
                 />
 
@@ -157,6 +166,7 @@ const handleAddProduct = (storeName) => {
                     type="number"
                     className="swal2-input styled-input"
                     placeholder="Contoh 1Kg"
+                    defaultValue={Number(toEditData?.quantity?.split("|")[0]) || ""}
                     style={{ margin: "0", width: "100%", marginBottom: "0.5rem" }}
                 />
 
@@ -165,7 +175,8 @@ const handleAddProduct = (storeName) => {
                     id="productStock"
                     type="number"
                     className="swal2-input styled-input"
-                    placeholder="Masukkan kuantitas"
+                    placeholder="Masukkan Stok"
+                    defaultValue={toEditData?.stock || ""}
                     style={{ margin: "0", width: "100%", marginBottom: "0.5rem" }}
                 />
                 <label htmlFor="productImg">Gambar Produk</label>
@@ -193,7 +204,7 @@ const handleAddProduct = (storeName) => {
             const NewProdData = {
                 "desc": document.getElementById("productDesc").value,
                 "detail": document.getElementById("productDetail").value,
-                "image": document.getElementById("productImg").files[0],
+                "image": document.getElementById("productImg").files[0] || "/public/images/apple-green.jpg",
                 "name": document.getElementById("productName").value,
                 "price": document.getElementById("productPrice").value,
                 "quantity": document.getElementById("productQty").value,
@@ -208,16 +219,36 @@ const handleAddProduct = (storeName) => {
                 return null;
             }
 
-            return toAddNewProduct(NewProdData)
+            return toAddNewProduct(NewProdData, isEdit, idProd)
         },
     }).then((result) => {
         if (result.isConfirmed) {
             console.log("Data Produk:", result.value);
             Swal.fire("Produk Disimpan!", "Produk berhasil ditambahkan.", "success");
+            refreshItem.current.click()
         }
     });
 
 };
+
+const handleDeleteProduct = async (storeId, prodId, refreshItem) => {
+    if (prodId !== null && storeId !== null) {
+        console.log("Key = ", prodId)
+        Swal.fire({
+            title: "Peringatan!",
+            text: "Anda Yakin ingin menhapus?",
+            icon: "warning",
+            confirmButtonColor: "#3085d6",
+            confirmButtonText: "Ya",
+            showCancelButton: true,
+            cancelButtonText: "Batal"
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                await deleteStoreProduct(storeId, prodId, refreshItem)
+            }
+        });
+    }
+}
 
 async function storeDataChange(newStoreData, StoreId) {
     await universalDataFunction("update", `Stores/${StoreId}`,
@@ -254,4 +285,4 @@ async function storeDataChange(newStoreData, StoreId) {
 }
 
 
-export { storeManagementDataFetch, handleAddProduct, StoreProductsData, storeDataChange }
+export { storeManagementDataFetch, handleAddProduct, StoreProductsData, storeDataChange, handleDeleteProduct }

@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "../css/history.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCancel, faHeart, faLocation, faLocationDot, faStar, faStore, faThumbsUp } from "@fortawesome/free-solid-svg-icons";
-import { getHistoryData, getUserId } from "../jsx/dataModel";
+import { faCancel, faStar, faThumbsUp } from "@fortawesome/free-solid-svg-icons";
+import { getHistoryData } from "../jsx/dataModel";
 import Transition from "../components/transition.jsx";
 import { FaStar } from "react-icons/fa6";
 import { toAuthWebPage } from "../jsx/isAuthChecker.jsx";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/auth/authcontext.jsx";
 import Swal from "sweetalert2";
-import { autoSuccessTranChecker, payNow, setTransToSuccess, universalDataFunction } from "../jsx/dataController.jsx";
+import { payNow, toCancelPayment, universalDataFunction } from "../jsx/dataController.jsx";
 import { FaHistory } from "react-icons/fa";
 
 function History() {
@@ -19,8 +19,7 @@ function History() {
     const [isCooldown, setIsCooldown] = useState(false)
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState("pending");
-    const [autoSetSuccess, setAutoSetSuccess] = useState(false);
-
+    const reTakeDataRef = useRef(null)
     const toDetailProduct = (event) => {
         const productId = event.target.closest('.hisProdCase').id.split('-')[1];
         navigate(`/ProductDetail?productId=${productId}`, {
@@ -46,25 +45,10 @@ function History() {
             return;
         }
         setIsCooldown(true);
-        // console.table(tranData)
         if (token) {
             navigate(`/processPayment?transactionId=${Id_Transaksi}&token=${token}`)
         } else {
-            console.log("tidak ada token")
-            await payNow(tranData, import.meta.env.VITE_API_KEY_SECRET).then(async (getToken) => {
-                if(getToken){
-                    console.log("Token : ", getToken)
-                    try {
-                        await universalDataFunction("update", `Transactions`, `${Id_Transaksi}.token`, getToken);
-                        navigate(`/processPayment?transactionId=${Id_Transaksi}&token=${getToken}`);
-                    } catch (error) {
-                        console.error("Error updating transaction or navigating:", error);
-                        alert("Terjadi kesalahan, silakan coba lagi.");
-                    }
-                }else{
-                    console.log("gagal")
-                }
-            })
+            await payNow(tranData, navigate)
         }
 
 
@@ -73,9 +57,10 @@ function History() {
             console.log("Cooldown selesai! Anda bisa menekan tombol lagi.");
         }, 3000);
     }
-    
-    async function takeData (){
+
+    async function takeData() {
         setHistoryDatas(await getHistoryData())
+        console.log("Retake")
     }
     useEffect(() => {
         setLoading(false);
@@ -86,7 +71,7 @@ function History() {
         setActiveTab(tab);
     };
 
-    if(loading){
+    if (loading) {
         return (
             <>
                 tunggu sebentar....
@@ -98,7 +83,10 @@ function History() {
             <Transition />
             <div className="HistoryPage">
                 <div className="HisHeading">
-                    <div className="HistoryLogoCase" style={{ fontSize: "1rem", display:"flex", justifyContent:"center"}}> <b>History</b> <FaHistory style={{ position:"absolute", right:"1rem"}} onClick={takeData}></FaHistory> </div>
+                    <div className="HistoryLogoCase" style={{ fontSize: "1rem", display: "flex", justifyContent: "center" }}>
+                        <b>History</b>
+                        <div ref={reTakeDataRef} onClick={takeData}><FaHistory style={{ position: "absolute", right: "1rem" }}></FaHistory></div>
+                    </div>
                     <div className="hisSwitch" style={{ fontSize: "0.8rem" }}>
                         <p
                             className={activeTab === "pending" ? "active" : ""}
@@ -131,13 +119,12 @@ function History() {
                     <>
                         <div className="container" id="HisPending" style={{ display: activeTab === "pending" ? "" : "none" }}>
                             {historiesData ? Object.entries(historiesData).map(([key, historyP]) => (
-                                (historyP?.recipt?.transaction_status === "pending"? autoSuccessTranChecker(historyP.Id_Transaksi) : ""),
                                 (historyP?.status === "pending") &&
                                 <div className="hisCardCase" key={historyP.Id_Transaksi + "p"}>
                                     <div className="hisProdCase" id={"product-" + historyP.Id_Produk} onClick={(e) => {
                                         toDetailProduct(e);
                                     }}>
-                                        
+
                                         <div className="leftSide">
                                             <div className="imgCase">
                                                 <img src={historyP.Gambar_Produk} alt={historyP.Nama_Produk} />
@@ -156,15 +143,21 @@ function History() {
                                     </div>
                                     <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                                         <b>Total Rp.{historyP.Total_Biaya}</b>
+                                        <b style={{ fontSize: "0.8rem", color: "green", padding: "0.5rem 0", marginLeft: "auto", marginRight: "1rem", color: "red" }}
+                                            onClick={() => {
+                                                toCancelPayment(historyP.Id_Toko, historyP.Id_Transaksi);
+                                                reTakeDataRef.current.click();
+                                            }}
+                                        >Batalkan</b>
                                         <b style={{ fontSize: "0.8rem", color: "green", padding: "0.5rem 0" }}
-                                            onClick={ () => {
-                                                toPay(historyP, historyP.Id_Transaksi, historyP?.token || null );
+                                            onClick={() => {
+                                                toPay(historyP, historyP.Id_Transaksi, historyP?.token || null);
                                             }}
                                         >{historyP?.recipt ? "Selesaikan Pembayaran" : "Bayar Sekarang"}</b>
                                     </div>
                                     <div className="separator"></div>
                                 </div>
-                            
+
                             )) : <center>Tidak ada data</center>}
 
                         </div>
@@ -191,6 +184,7 @@ function History() {
                                     </div>
                                     <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                                         <b>Total Rp.{historyPr.Total_Biaya}</b>
+                                        <b>Diproses</b>
                                     </div>
                                     <div className="separator"></div>
                                 </div>
@@ -210,7 +204,7 @@ function History() {
                                                 <b className="detailProdName">{historyB.Nama_Produk}</b>
                                                 <b className="detailStatus">juli - 2024 | {historyB.Status_Transaksi}</b>
                                                 <b className="detailWeight">{historyB.Kuantitas}&nbsp;{"Rp." + historyB.Harga_Produk}</b>
-                                                <b style={{ fontSize: "0.8rem" }}>Jumlah Beli {historyB.Jumlah_Beli} | {"Rp."+historyB.Total_Biaya}</b>
+                                                <b style={{ fontSize: "0.8rem" }}>Jumlah Beli {historyB.Jumlah_Beli} | {"Rp." + historyB.Total_Biaya}</b>
                                             </div>
                                         </div>
                                         <div className="rightSide">

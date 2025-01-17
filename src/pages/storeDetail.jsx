@@ -20,6 +20,7 @@ function StoreDetail() {
     const [isSelfStore, setIsSelfStore] = useState(false);
     const [isFav, setIsFav] = useState(false);
     const [storeData, setStoreProducts] = useState(null);
+    
 
     const toDetailProduct = (event) => {
         const productId = event.target.closest('.productCase').id.split('-')[1];

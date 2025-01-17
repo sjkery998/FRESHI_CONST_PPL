@@ -1,0 +1,4 @@
+{
+   "id1": { "id": "id1", "title": "Pesanan Diproses", "message": "Pesanan Anda sedang diproses dan akan segera dikirim.", "timestamp": "2025-01-01 09:00", "isRead": false, "type": "order"},
+   "id2": { "id": 2, "title": "Diskon Spesial", "message": "Dapatkan diskon 20% untuk produk buah segar hari ini!", "timestamp": "2025-01-01 08:30", "isRead": false, "type": "promo"}
+}
