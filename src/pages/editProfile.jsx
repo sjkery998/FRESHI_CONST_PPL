@@ -9,9 +9,9 @@ function EditProfilePage() {
     const navigate = useNavigate();
     const viewH = window.innerHeight;
     const [formEditProfile, setformEditProfile] = useState({
-        Username : "",
-        PhoneNum : "",
-        Address : "",
+        Username: "",
+        PhoneNum: "",
+        Address: "",
     })
 
     const [profileDataHeight, setProfileDataHeight] = useState(0);
@@ -21,7 +21,13 @@ function EditProfilePage() {
         if (editAvatarContainer) {
             const avatarBottom = editAvatarContainer.getBoundingClientRect().bottom;
             const remainingHeight = viewH - avatarBottom;
-            setProfileDataHeight(remainingHeight); 
+            setProfileDataHeight(remainingHeight);
+
+            setformEditProfile({
+                Username: userData?.Username || "",
+                PhoneNum: userData?.PhoneNumber || "",
+                Address: userData?.Address || "",
+            })
         }
     }, []);
     return (
@@ -35,23 +41,23 @@ function EditProfilePage() {
                 <img src="/images/storeAvatar.png" alt="" />
                 <b style={{ fontSize: "1.4rem", color: "whitesmoke" }}>Foto Profil</b>
             </div>
-            <form action="" className="editProfileDataContainer" style={{height:`calc(${profileDataHeight}px - 2rem)`}}
-                onSubmit={async (e)=> {
-                    await editProfileData(formEditProfile).then(()=> setformEditProfile({Username : "", PhoneNum: "", Address: ""}));
+            <form action="" className="editProfileDataContainer" style={{ height: `calc(${profileDataHeight}px - 2rem)` }}
+                onSubmit={async (e) => {
+                    await editProfileData(formEditProfile).then(() => setformEditProfile({ Username: "", PhoneNum: "", Address: "" }));
                     e.preventDefault()
                 }}
             >
-                <input type="text" placeholder="Username" 
-                    value={formEditProfile.Username === "" && userData.Username}
-                    onChange={(e)=> setformEditProfile({...formEditProfile, "Username" : e.target.value || ""})}
+                <input type="text" placeholder="Username"
+                    value={formEditProfile.Username}
+                    onChange={(e) => setformEditProfile({ ...formEditProfile, "Username": e.target.value || "" })}
                 />
-                <input type="number" placeholder="Nomor Telepon" 
-                    value={formEditProfile.PhoneNum === "" && userData.PhoneNumber}
-                    onChange={(e)=> setformEditProfile({...formEditProfile, "PhoneNum" : e.target.value || ""})}
+                <input type="number" placeholder="Nomor Telepon"
+                    value={formEditProfile.PhoneNum}
+                    onChange={(e) => setformEditProfile({ ...formEditProfile, "PhoneNum": e.target.value || "" })}
                 />
-                <input type="text" placeholder="Alamat" 
-                    value={formEditProfile.Address === "" && userData.Address}
-                    onChange={(e)=> setformEditProfile({...formEditProfile, "Address" : e.target.value || ""})}
+                <input type="text" placeholder="Alamat"
+                    value={formEditProfile.Address}
+                    onChange={(e) => setformEditProfile({ ...formEditProfile, "Address": e.target.value || "" })}
                 />
                 <input type="submit" value="Simpan Semua" />
             </form>

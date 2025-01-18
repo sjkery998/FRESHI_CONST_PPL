@@ -4,7 +4,7 @@ import '../css/storeDetail.css';
 import { FaArrowLeft, FaLocationPin, FaMagnifyingGlass, FaMessage } from 'react-icons/fa6';
 import { FaHeart, FaLemon, FaStar } from 'react-icons/fa';
 import { getStoreData, getUserId } from '../jsx/dataModel.jsx';
-import { addStoreToFav, addVisitoreStore, checkHasChat, isSelfOwnStore, specifiedTakeData } from '../jsx/dataController.jsx';
+import { addStoreToFav, addVisitoreStore, checkHasChat, generateRandomAlphanumeric, isSelfOwnStore, specifiedTakeData } from '../jsx/dataController.jsx';
 import { useAuth } from '../context/auth/authcontext.jsx';
 import Swal from 'sweetalert2';
 import Transition from '../components/transition.jsx';
@@ -19,7 +19,8 @@ function StoreDetail() {
 
     const [isSelfStore, setIsSelfStore] = useState(false);
     const [isFav, setIsFav] = useState(false);
-    const [storeData, setStoreProducts] = useState(null);
+    const [storeData, setStoreProducts] = useState({ StoreData: {}, StoreProducts: {} });
+
     
 
     const toDetailProduct = (event) => {
@@ -58,29 +59,12 @@ function StoreDetail() {
         }
     };
 
-    const handleBack = () => {
-        if (location.state?.fromAuth) {
-            navigate('/');
-        } else if (location.state?.fromFavorite) {
-            navigate(-1);
-        } else if (location.state?.fromChatting) {
-            navigate(-1);
-        } else {
-            navigate('/');
-        }
+    function handleBack(){
+        navigate('/');
     };
 
 
-    const isSelf = async () => {
-        const UID = await getUserId();
-        if (UID === storeData.StoreData.UserId) {
-            setIsSelfStore(true)
-        } else {
-            setIsSelfStore(false)
-        }
-    }
-
-
+    
     useEffect(() => {
         const addNewVisitor = async ()=>{
             await addVisitoreStore(await getUserId(), storeId)
@@ -113,17 +97,21 @@ function StoreDetail() {
         addNewVisitor();
     }, [storeId, userLoggedIn]);
 
-    if (!storeData) {
-        return "";
-    } else {
-        isSelf();
-    }
-
+    useEffect(() => {
+        const checkIsSelf = async () => {
+            if (storeData?.StoreData) {
+                const UID = await getUserId();
+                setIsSelfStore(UID === storeData.StoreData.UserId);
+            }
+        };
+        checkIsSelf();
+    }, [storeData]);
+    
     return (
         <>
             <Transition />
             <div className="StoreDetailLogoCase">
-                <FaArrowLeft style={{ fontSize: "1.2rem", cursor: 'pointer' }} onClick={handleBack} />
+                <FaArrowLeft style={{ fontSize: "1.2rem", cursor: 'pointer' }} onClick={()=>{handleBack()}} />
                 <b>{storeData.StoreData.StoreName}</b>
             </div>
             <div className="StoreDetailsPage">
@@ -142,8 +130,8 @@ function StoreDetail() {
                             </div>
                             <div className="storeChatBox" onClick={async () => {
                                 if (userLoggedIn) {
-                                    const chtid = await checkHasChat(storeData.StoreData.UserId)
-                                    if (chtid.status === true) {
+                                    const chtid = storeData?.StoreData?.UserId? await checkHasChat(storeData.StoreData.UserId) : false;
+                                    if (chtid && chtid?.status === true) {
                                         if(isSelfStore === false){
                                             navigate(`/ChattingPage?${chtid.ChatId}`)
                                         }else{
@@ -156,8 +144,9 @@ function StoreDetail() {
                                             })
                                         }
                                     } else {
+                                        const chatIds = generateRandomAlphanumeric()
                                         if(isSelfStore === false){
-                                            navigate(`/ChattingPage?${chtid.ChatId}-${storeId}`)
+                                            navigate(`/ChattingPage?${chatIds}-${storeId}`)
                                         }else{
                                             Swal.fire({
                                                 title: "Toko Anda!",

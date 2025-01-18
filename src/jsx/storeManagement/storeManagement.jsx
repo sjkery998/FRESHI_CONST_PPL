@@ -76,6 +76,8 @@ async function storeManagementDataFetch(callback) {
             const transactionData = sData.Transactions
                 ? Object.values(sData.Transactions).map((tra) => ({
                     traId: tra.Id_Transaksi,
+                    traIdProd: tra.Id_Produk,
+                    traNameProd: tra.Nama_Produk,
                     traTime: tra.Tanggal_Masuk,
                     traCustomerName: tra.Nama,
                     traCustomerId: tra.Id_User,

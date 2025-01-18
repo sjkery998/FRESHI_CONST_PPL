@@ -155,7 +155,7 @@ function AuthWebPage() {
                         }}
                     >
                         <div className="authHeadButton">
-                            <b onClick={() => { handleExpand(); setIsForgotPass(false) }}>Kembali</b>
+                            <b onClick={() => { handleExpand(); setIsForgotPass(false) }} style={{marginTop:"0.5rem"}}>Kembali</b>
                         </div>
                         <div
                             style={{
@@ -168,6 +168,7 @@ function AuthWebPage() {
                             <h1 className="freshILogo">Fresh.i</h1>
                             <p>Suplai marketnya buah-buahan segar</p>
                         </div>
+                            <h3 style={{paddingLeft:"0.2rem", marginBottom:"0.5rem"}}>{authType === "register" ? "Mendaftar" : authType === "login" ? "Masuk" : authType === "resetPassword" ? "Ubah Sandi" : ""}</h3>
                         <input
                             type="email"
                             placeholder={isForgotPass ? "Masukan email Terdaftar" : "Masukan email anda"}

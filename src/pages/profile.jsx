@@ -133,7 +133,9 @@ function Profile() {
                             <b>Atur Akun</b>
                             <FontAwesomeIcon icon={faArrowRight} className="profileArrowRight"></FontAwesomeIcon>
                         </div>
-                        <div className="profileOptions">
+                        <div className="profileOptions" onClick={()=>{
+                            window.location.href = "https://github.com/sjkery998/FRESHI_CONST_PPL"
+                        }}>
                             <FaGithub />
                             <b>Source Code</b>
                             <FontAwesomeIcon icon={faArrowRight} className="profileArrowRight"></FontAwesomeIcon>

@@ -104,7 +104,7 @@ function History() {
                             className={activeTab === "success" ? "active" : ""}
                             onClick={() => handleTabClick("success")}
                         >
-                            Berhasil
+                            Selesai
                         </p>
                         <p
                             className={activeTab === "canceled" ? "active" : ""}
@@ -143,9 +143,9 @@ function History() {
                                     </div>
                                     <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                                         <b>Total Rp.{historyP.Total_Biaya}</b>
-                                        <b style={{ fontSize: "0.8rem", color: "green", padding: "0.5rem 0", marginLeft: "auto", marginRight: "1rem", color: "red" }}
-                                            onClick={() => {
-                                                toCancelPayment(historyP.Id_Toko, historyP.Id_Transaksi);
+                                        <b style={{ fontSize: "0.8rem", padding: "0.5rem 0", marginLeft: "auto", marginRight: "1rem", color: "red" }}
+                                            onClick={async () => {
+                                                await toCancelPayment(historyP.Id_Toko, historyP.Id_Transaksi);
                                                 reTakeDataRef.current.click();
                                             }}
                                         >Batalkan</b>
@@ -192,7 +192,7 @@ function History() {
                         </div>
                         <div className="container" id="HisSuccess" style={{ display: activeTab === "success" ? "" : "none" }}>
                             {historiesData ? Object.entries(historiesData).map(([key, historyB]) => (
-                                (historyB?.status === "berhasil") &&
+                                (historyB?.status === "selesai") &&
                                 <div className="hisCardCase" key={historyB.Id_Transaksi + "b"}>
                                     <div className="hisProdCase">
                                         <div className="leftSide">

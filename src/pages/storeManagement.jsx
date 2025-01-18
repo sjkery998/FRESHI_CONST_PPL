@@ -10,6 +10,7 @@ import { TbReload } from 'react-icons/tb';
 import { MdSpaceDashboard } from 'react-icons/md';
 import { handleAddProduct, handleDeleteProduct, storeDataChange, storeManagementDataFetch, StoreProductsData } from '../jsx/storeManagement/storeManagement.jsx';
 import Swal from 'sweetalert2';
+import { setTraToFinish } from '../jsx/dataController.jsx';
 
 function StoreManagement() {
     const { userLoggedIn } = useAuth();
@@ -20,12 +21,29 @@ function StoreManagement() {
     const [prodDataM, setProdDataM] = useState(null);
     const [selectedNavItem, setSelectedNavItem] = useState("Dashboard");
     const [isFormChanged, setIsFormChanged] = useState(false);
+    const [toPreviewTra, setToPreviewTra] = useState(
+        {
+            "isShow": false,
+            "Id Transaksi": "",
+            "Nama Pembeli": "",
+            "Tanggal Masuk": "",
+            "Id Produk": "",
+            "Nama Produk": "",
+            "Pembayaran Via": "",
+            "Rekening Va": "",
+            "Total Biaya": "",
+            "Pembayaran Selesai": "",
+            "Status": "",
+            "StoreId": ""
+        }
+    )
     const [toPreview, setToPreview] = useState({
         isPreview: false,
         index: 0
     });
     const submitFormStore = useRef(null);
     const nameStoreRef = useRef(null)
+    const [navPosition, setNavPosition] = useState("dashboard");
     const navItemRef = useRef({
         Dashboard: useRef(null),
         Transaction: useRef(null),
@@ -169,7 +187,7 @@ function StoreManagement() {
                 <b>Management Toko</b>
                 <TbReload style={{ fontSize: "1.2rem", cursor: 'pointer' }} onClick={handleBack} />
             </div>
-            <div className="StoreDetailsPage">
+            <div className="StoreDetailsPage" style={{ height: window.innerHeight }}>
                 <div className="mainStorCase">
                     <div className="storeBackgroudCase">
                         <img src="/images/storeBack.png" alt="" />
@@ -186,23 +204,23 @@ function StoreManagement() {
                             </div>
                         </div>
                         <div className='storeManageOptions'>
-                            <div className="storeDetailHeadline manageOptions" id='Dashboard' ref={navItemRef.current.Dashboard} onClick={(e) => { navItemClicked(e) }}>
+                            <div className="storeDetailHeadline manageOptions" style={{color: navPosition === "Dashboard" ? "rgb(101, 213, 103)" : "white" }} id='Dashboard' ref={navItemRef.current.Dashboard} onClick={(e) => { navItemClicked(e);setNavPosition(e.target.closest(".manageOptions").id) }}>
                                 <MdSpaceDashboard />
                                 <p>Dashboard</p>
                             </div>
-                            <div className="storeDetailHeadline manageOptions" id='Transactions' ref={navItemRef.current.Transaction} onClick={(e) => { navItemClicked(e) }}>
+                            <div className="storeDetailHeadline manageOptions" style={{color: navPosition === "Transactions" ? "rgb(101, 213, 103)" : "white" }} id='Transactions' ref={navItemRef.current.Transaction} onClick={(e) => { navItemClicked(e); setNavPosition(e.target.closest(".manageOptions").id) }}>
                                 <FaReceipt />
                                 <p>Transaksi</p>
                             </div>
-                            <div className="storeDetailHeadline manageOptions" id='Products' ref={navItemRef.current.Products} onClick={(e) => { navItemClicked(e) }}>
+                            <div className="storeDetailHeadline manageOptions" style={{color: navPosition === "Products" ? "rgb(101, 213, 103)" : "white" }} id='Products' ref={navItemRef.current.Products} onClick={(e) => { navItemClicked(e);setNavPosition(e.target.closest(".manageOptions").id) }}>
                                 <FaFolder />
                                 <p>Produk</p>
                             </div>
-                            <div className="storeDetailHeadline manageOptions" id='StoreData' ref={navItemRef.current.StoreData} onClick={(e) => { navItemClicked(e) }}>
+                            <div className="storeDetailHeadline manageOptions" style={{color: navPosition === "StoreData" ? "rgb(101, 213, 103)" : "white" }} id='StoreData' ref={navItemRef.current.StoreData} onClick={(e) => { navItemClicked(e);setNavPosition(e.target.closest(".manageOptions").id) }}>
                                 <FaStore />
                                 <p>Data Toko</p>
                             </div>
-                            <div className="storeDetailHeadline manageOptions" id='Invoice' ref={navItemRef.current.Invoice} onClick={(e) => { navItemClicked(e) }}>
+                            <div className="storeDetailHeadline manageOptions" style={{color: navPosition === "Invoice" ? "rgb(101, 213, 103)" : "white" }} id='Invoice' ref={navItemRef.current.Invoice} onClick={(e) => { navItemClicked(e);setNavPosition(e.target.closest(".manageOptions").id) }}>
                                 <FaFileInvoice />
                                 <p>Invoice</p>
                             </div>
@@ -279,25 +297,72 @@ function StoreManagement() {
                     <div className="trManagement" style={{ display: selectedNavItem === "Transactions" ? "" : "none" }}>
                         <b className="trTitle">Permintaan Pesanan</b>
                         <div className="trHeading">
-                            <div className="trItems" id='PesananMasuk' onClick={(e) => { changePage(e) }}>Masuk</div>
-                            <div className="trItems" id='Dibatalkan' onClick={(e) => { changePage(e) }}>Dibatalkan</div>
-                            <div className="trItems" id='PesananSelesai' onClick={(e) => { changePage(e) }}>Selesai</div>
+                            <div className="trItems" style={{color: trPage === "PesananMasuk" ? "rgb(101, 213, 103)" : "black" }} id='PesananMasuk' onClick={(e) => { changePage(e) }}>Masuk</div>
+                            <div className="trItems" style={{color: trPage === "Dibatalkan" ? "rgb(101, 213, 103)" : "black" }} id='Dibatalkan' onClick={(e) => { changePage(e) }}>Dibatalkan</div>
+                            <div className="trItems" style={{color: trPage === "Selesai" ? "rgb(101, 213, 103)" : "black" }} id='Selesai' onClick={(e) => { changePage(e) }}>Selesai</div>
                         </div>
                         <div className="trContainer">
-                            {selectedNavItem === "Transactions" ? trPage === "PesananMasuk" ? currentItems?.length > 0 ? currentItems?.map((transaction, index) => (
-                                <div className="trCards" key={index}>
-                                    <div className="trCardMain">
-                                        <b>#{transaction?.traId}</b>
-                                        <p>Pembayaran : {transaction?.traStatus === "diproses" ? "Berhasil" : transaction?.traStatus === "dibatalkan" ? "Dibatalkan" : "Belum Dibayar"}</p>
-                                        <p>Status : {transaction?.traStatus || "Tidak diketahui"}</p>
-                                    </div>
-                                    <div className="trCardEnd">
-                                        <b>Detail</b>
-                                        <p>{transaction?.traSettledTime || "Belum selesai"}</p>
-                                    </div>
-                                </div>
-                            )) : <center>Tidak Ada Data</center> : <center>Tidak Ada Data</center> : null
-                            }
+                            {selectedNavItem === "Transactions" && (
+                                ["PesananMasuk", "Dibatalkan", "Selesai"].includes(trPage) ? (
+                                    currentItems?.filter(transaction => {
+                                        if (trPage === "PesananMasuk") return transaction?.traStatus === "diproses";
+                                        if (trPage === "Dibatalkan") return transaction?.traStatus === "dibatalkan";
+                                        if (trPage === "Selesai") return transaction?.traStatus === "selesai";
+                                        return false;
+                                    }).length > 0 ? (
+                                        currentItems
+                                            .filter(transaction => {
+                                                if (trPage === "PesananMasuk") return transaction?.traStatus === "diproses";
+                                                if (trPage === "Dibatalkan") return transaction?.traStatus === "dibatalkan";
+                                                if (trPage === "Selesai") return transaction?.traStatus === "selesai";
+                                                return false;
+                                            })
+                                            .map((transaction, index) => (
+                                                <div className="trCards" key={index} onClick={() => {
+                                                    setToPreviewTra({
+                                                        "isShow": true,
+                                                        "Id Transaksi": transaction?.traId,
+                                                        "Id Pembeli": transaction?.traCustomerId,
+                                                        "Nama Pembeli": transaction?.traCustomerName,
+                                                        "Tanggal Masuk": transaction?.traEnterDate,
+                                                        "Id Produk": transaction?.traIdProd,
+                                                        "Nama Produk": transaction?.traNameProd,
+                                                        "Pembayaran Via": transaction?.traPaymentDetail.traPaymentType,
+                                                        "Rekening Va": transaction?.traPaymentDetail.traVaBank,
+                                                        "Total Biaya": transaction?.traPaymentDetail.traVaNumber,
+                                                        "Pembayaran Selesai": transaction?.traSettledTime,
+                                                        "Status": transaction?.traStatus,
+                                                        "StoreId": storeDataM?.storeData?.storeId,
+                                                    })
+
+                                                }}>
+                                                    <div className="trCardMain">
+                                                        <b>#{transaction?.traId}</b>
+                                                        <p>
+                                                            Pembayaran:{" "}
+                                                            {transaction?.traStatus === "diproses"
+                                                                ? "Berhasil"
+                                                                : transaction?.traStatus === "dibatalkan"
+                                                                    ? "Dibatalkan"
+                                                                    : "Selesai"}
+                                                        </p>
+                                                        <p>Status: {transaction?.traStatus || "Tidak diketahui"}</p>
+                                                    </div>
+                                                    <div className="trCardEnd">
+                                                        <b>Detail</b>
+                                                        <p>{transaction?.traSettledTime || "Belum selesai"}</p>
+                                                    </div>
+                                                </div>
+                                            ))
+                                    ) : (
+                                        <center>Tidak Ada Data</center>
+                                    )
+                                ) : (
+                                    <center>Tidak Ada Data</center>
+                                )
+                            )}
+
+
                         </div>
                         {isDataReady && selectedNavItem === "Transactions" && totalSlides > 0 && (
                             <div className="trPaging">
@@ -375,7 +440,7 @@ function StoreManagement() {
                                             <div className="prodCardMain">
                                                 <b>{product.name}</b>
                                                 <p>Kode : {product.id}</p>
-                                                <p>Perlihat : {product.status ? 'Aktif' : 'Nonaktif'}</p>
+                                                <p>Perlihat : {product.status ? 'Aktif' : 'Aktif'}</p>
                                             </div>
                                             <div className="prodCardEnd">
                                                 <b onClick={
@@ -643,6 +708,78 @@ function StoreManagement() {
                         </div>
                     </div>
 
+                </div>
+            }
+            {toPreviewTra.isShow &&
+                <div className="caseToPrevTra"
+                    style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems:"center",
+                        justifyContent:'center',
+                        width: document.body.clientWidth,
+                        height: document.body.clientHeight,
+                        backgroundColor: 'rgba(0, 0, 0, 0.63)',
+                        position: 'absolute',
+                        zIndex: '12',
+                        top: "0"
+                    }}
+                >
+                    <div
+                        className="toPreivewTra"
+                        style={{
+                            position: 'absolute',
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: '15px',
+                            padding: '20px',
+                            width: '80%',
+                            maxWidth: '800px',
+                            backgroundColor: 'white',
+                            borderRadius: '8px',
+                            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                            zIndex: '12'
+                        }}
+                    >
+                        <div style={{
+                            display: "flex",
+                            flexDirection: "row",
+                            justifyContent: "space-between",
+                            alignItems: "center"
+                        }}><h1>FRESH.I</h1> <b onClick={() => {
+                            setToPreviewTra({
+                                ...toPreviewTra,
+                                isShow: false,
+                            })
+                        }}>Tutup</b></div>
+                        <div className="separator"></div>
+                        <p style={{ margin: '10px 0', fontWeight: 'bold', textAlign: "justify" }}>ID Transaksi: {toPreviewTra['Id Transaksi']}</p>
+                        <p style={{ margin: '10px 0' }}>Nama Pembeli: {toPreviewTra['Nama Pembeli']}</p>
+                        <p style={{ margin: '10px 0' }}>Tanggal Masuk: {toPreviewTra['Tanggal Masuk']}</p>
+                        <p style={{ margin: '10px 0' }}>ID Produk: {toPreviewTra['Id Produk']}</p>
+                        <p style={{ margin: '10px 0' }}>Pembayaran Via: {toPreviewTra['Pembayaran Via']}</p>
+                        <p style={{ margin: '10px 0' }}>Rekening VA: {toPreviewTra['Rekening Va']}</p>
+                        <p style={{ margin: '10px 0' }}>Total Biaya: {toPreviewTra['Total Biaya']}</p>
+                        <p style={{ margin: '10px 0' }}>Pembayaran Selesai: {toPreviewTra['Pembayaran Selesai']}</p>
+                        <p style={{ margin: '10px 0', fontWeight: 'bold' }}>Status: {toPreviewTra.Status}</p>
+                        <div className="separator"></div>
+                        {toPreviewTra.Status === "diproses" && <div>
+                            <div style={{
+                                display: "flex",
+                                flexDirection: "row",
+                                justifyContent: "space-between",
+                                alignItems: "center"
+                            }}><b>Atur Sebagai Selesai</b> <b onClick={async () => {
+                                await setTraToFinish(toPreviewTra.StoreId, toPreviewTra['Id Transaksi'], toPreviewTra["Id Pembeli"], toPreviewTra['Id Produk'], toPreviewTra['Nama Produk'])
+                                setToPreviewTra({
+                                    ...toPreviewTra,
+                                    isShow: false,
+                                })
+                            }}>Atur</b></div>
+                        </div>}
+                        <div className="separator"></div>
+
+                    </div>
                 </div>
             }
         </>

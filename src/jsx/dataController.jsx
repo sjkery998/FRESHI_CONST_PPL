@@ -755,8 +755,7 @@ const toCancelPayment = async (idToko, idTran) => {
     if (idToko !== undefined && idTran !== undefined) {
         console.log(idToko, idTran);
         await universalDataFunction("update", `Stores/${idToko}`, `Transactions.${idTran}.status`, "dibatalkan")
-        await set(ref(db, `Accounts/${await getUserId()}/Transactions/${idTran}`), null)
-        await set(ref(db, `Transactions/${idTran}`), null)
+        await set(ref(db, `Transactions/${idTran}/status`), "dibatalkan")
         Swal.fire("Transaksi Dibatalkan.", "success");
     }
 }
@@ -767,4 +766,29 @@ const setNotificationToRead = (notifId)=>{
     }
 }
 
-export { getDataFromNode, universalDataFunction, universalTakeData, specifiedTakeData, generateCurrentTime, generateRandomAlphanumeric, addProdToFav, addStoreToFav, addTransaction, payNow, setTransToSuccess, chatMessageListener, sendMessage, chatIdValidator, isUserHasStore, checkHasChat, isSelfOwnStore, userChatsListener, addVisitoreStore, setAccountData, registerToSeller, toAddNewProduct, editProfileData, deleteStoreProduct, toCancelPayment, setNotificationToRead }
+const setTraToFinish = async (storeId, traId, idCustomer, prodId, prodName)=>{
+    if (storeId !== undefined && traId !== undefined) {
+        await universalDataFunction("update", `Stores/${storeId}`, `Transactions.${traId}.status`, "selesai")
+        await set(ref(db, `Transactions/${traId}/status`), "selesai")
+        Swal.fire("Transaksi Telah Selesai.", "success");
+        const notifId = generateRandomAlphanumeric();
+        await universalDataFunction("update", `Accounts/${idCustomer}/Notifications/${notifId}`,
+            [
+                `id`,
+                `isRead`,
+                `message`,
+                `timestamp`,
+                `type`
+            ],
+            [
+                notifId,
+                false,
+                `Pesanan Telah Selesai. id Produk : ${prodName} | id order : ${prodId}`,
+                generateCurrentTime(),
+                'order'
+            ]
+        );
+    }
+}
+
+export { getDataFromNode, universalDataFunction, universalTakeData, specifiedTakeData, generateCurrentTime, generateRandomAlphanumeric, addProdToFav, addStoreToFav, addTransaction, payNow, setTransToSuccess, chatMessageListener, sendMessage, chatIdValidator, isUserHasStore, checkHasChat, isSelfOwnStore, userChatsListener, addVisitoreStore, setAccountData, registerToSeller, toAddNewProduct, editProfileData, deleteStoreProduct, toCancelPayment, setNotificationToRead, setTraToFinish }
